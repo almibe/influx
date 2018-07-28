@@ -47,19 +47,29 @@ class Lexer(val command: String) {
         }
     }
 
-    fun checkString(): InfluxToken? {
+    private fun checkString(): InfluxToken? {
         return null
     }
 
-    fun checkNumber(): InfluxToken? {
+    private fun checkNumber(): InfluxToken? {
         return null
     }
 
-    fun checkKeyword(): InfluxToken? {
-        return null
+    private fun checkKeyword(): InfluxToken? {
+        val keyword = StringBuilder()
+        while (currentChar in 'a'..'z' || currentChar in 'A'..'Z' || currentChar in '0'..'9') {
+            keyword.append(currentChar)
+            if (currentCharPos < length) {
+                currentChar = command[currentCharPos]
+                currentCharPos++
+            } else {
+                break
+            }
+        }
+        return InfluxToken(TokenType.KEYWORD, keyword.toString())
     }
 
-    fun checkArrow(): InfluxToken? {
+    private fun checkArrow(): InfluxToken? {
         return null
     }
 }
