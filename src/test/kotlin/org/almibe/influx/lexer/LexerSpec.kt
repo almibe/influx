@@ -23,6 +23,13 @@ import io.kotlintest.shouldBe
 import io.kotlintest.specs.StringSpec
 
 class LexerSpec : StringSpec({
+    "comma test" {
+        val command = ","
+        val lexer = Lexer(command)
+        lexer.nextToken() shouldBe InfluxToken(TokenType.COMMA, ",")
+        lexer.nextToken() shouldBe null
+    }
+
     "keyword test" {
         val command = "find"
         val lexer = Lexer(command)

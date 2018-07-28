@@ -25,11 +25,41 @@ class Lexer(val command: String) {
     private val length = command.length
 
     fun nextToken(): InfluxToken? {
-        if (currentCharPos < length) {
+        return if (currentCharPos < length) {
             currentChar = command[currentCharPos]
-
+            currentCharPos++
+            when (currentChar) {
+                //single character checks
+                ':' -> InfluxToken(TokenType.COLON, ":")
+                '{' -> InfluxToken(TokenType.START_BRACE, "{")
+                '}' -> InfluxToken(TokenType.END_BRACE, "}")
+                ',' -> InfluxToken(TokenType.COMMA, ",")
+                //multi character checks
+                '"' -> checkString()
+                in '0'..'9' -> checkNumber()
+                in 'a'..'z' -> checkKeyword()
+                in 'A'..'Z' -> checkKeyword()
+                '-', '='-> checkArrow()
+                else -> null
+            }
+        } else {
+            null
         }
+    }
 
+    fun checkString(): InfluxToken? {
+        return null
+    }
+
+    fun checkNumber(): InfluxToken? {
+        return null
+    }
+
+    fun checkKeyword(): InfluxToken? {
+        return null
+    }
+
+    fun checkArrow(): InfluxToken? {
         return null
     }
 }
