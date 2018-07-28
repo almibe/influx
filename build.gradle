@@ -12,8 +12,13 @@ repositories {
     mavenLocal()
 }
 
+test {
+    useJUnitPlatform()
+}
+
 dependencies {
     compile 'org.jetbrains.kotlin:kotlin-stdlib:1.2.51'
+    testCompile 'io.kotlintest:kotlintest-runner-junit5:3.1.7'
 }
 
 bundle {
