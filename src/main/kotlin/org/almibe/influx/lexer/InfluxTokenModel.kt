@@ -17,13 +17,21 @@ specific language governing permissions and limitations
 under the License.
 */
 
-package org.almibe.influx
+package org.almibe.influx.lexer
 
-import jetbrains.exodus.entitystore.EntityIterable
-import jetbrains.exodus.entitystore.PersistentEntityStore
+enum class TokenType {
+    STRING,
+    NUMBER,
+    KEYWORD, //any character string out of quotes
+    ARROW, // -> outside of quotes
+    FAT_ARROW, // => outside of quotes
+    COLON,
+    START_BRACE,
+    END_BRACE,
+    COMMA
+}
 
-class Influx(private val entityStore: PersistentEntityStore) {
-    fun run(command: String): EntityIterable? {
-        return null
-    }
+interface InfluxToken {
+    val tokenType: TokenType
+    val tokenContent: String
 }

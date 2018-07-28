@@ -19,12 +19,23 @@ under the License.
 
 package org.almibe.influx
 
-import com.google.common.io.Files
+
+import jetbrains.exodus.entitystore.PersistentEntityStore
 import jetbrains.exodus.entitystore.PersistentEntityStores
+import java.nio.file.Files
 
 object EntityStoreInstance {
-    val entityStore = PersistentEntityStores.newInstance(Files.createTempDir().absoluteFile)
+    val entityStore: PersistentEntityStore = PersistentEntityStores.newInstance(Files.createTempDirectory("tmp").toFile())!!
 
-    fun initialize() {
+    init {
+        entityStore.executeInExclusiveTransaction {
+            val nintendo = it.newEntity("Company")
+            nintendo.setProperty("name", "Nintendo")
+
+            val gb = it.newEntity("VideoGameSystem")
+            gb.setProperty("name", "Game Boy")
+            gb.setProperty("company", "Nintendo")
+            gb.setLink("company", nintendo)
+        }
     }
 }

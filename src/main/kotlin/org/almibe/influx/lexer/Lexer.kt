@@ -17,13 +17,19 @@ specific language governing permissions and limitations
 under the License.
 */
 
-package org.almibe.influx
+package org.almibe.influx.lexer
 
-import jetbrains.exodus.entitystore.EntityIterable
-import jetbrains.exodus.entitystore.PersistentEntityStore
+class Lexer(val command: String) {
+    private var currentCharPos = 0
+    private var currentChar: Char? = null
+    private val length = command.length
 
-class Influx(private val entityStore: PersistentEntityStore) {
-    fun run(command: String): EntityIterable? {
+    fun nextToken(): InfluxToken? {
+        if (currentCharPos < length) {
+            currentChar = command[currentCharPos]
+
+        }
+
         return null
     }
 }
