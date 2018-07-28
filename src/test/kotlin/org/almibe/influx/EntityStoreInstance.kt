@@ -19,8 +19,12 @@ under the License.
 
 package org.almibe.influx
 
-import io.kotlintest.specs.StringSpec
+import com.google.common.io.Files
+import jetbrains.exodus.entitystore.PersistentEntityStores
 
-class InfluxSpec : StringSpec({
+object EntityStoreInstance {
+    val entityStore = PersistentEntityStores.newInstance(Files.createTempDir().absoluteFile)
 
-})
+    fun initialize() {
+    }
+}
