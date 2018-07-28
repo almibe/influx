@@ -31,7 +31,5 @@ enum class TokenType {
     COMMA
 }
 
-interface InfluxToken {
-    val tokenType: TokenType
-    val tokenContent: String
-}
+data class InfluxToken(val tokenType: TokenType, val tokenContent: String)
+
