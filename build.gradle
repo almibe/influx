@@ -1,0 +1,22 @@
+plugins {
+    id 'org.jetbrains.kotlin.jvm' version '1.2.51'
+    id 'org.dm.bundle' version '0.10.0'
+    id 'maven'
+}
+
+group 'org.almibe'
+version '0.1.0-SNAPSHOT'
+
+repositories {
+    jcenter()
+    mavenLocal()
+}
+
+dependencies {
+    compile 'org.jetbrains.kotlin:kotlin-stdlib:1.2.51'
+}
+
+bundle {
+    instruction 'Import-Package', '*'
+    instruction 'Export-Package', 'org.almibe.influx.*'
+}
