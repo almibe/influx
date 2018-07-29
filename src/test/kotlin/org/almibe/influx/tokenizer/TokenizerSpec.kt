@@ -47,16 +47,30 @@ class TokenizerSpec : StringSpec({
     }
 
     "int test" {
+        val command = "6"
+        val tokens = tokenizer.tokenize(command)
+        tokens[0] shouldBe InfluxToken(TokenType.NUMBER, "6")
+        tokens.size shouldBe 1
+    }
+
+    "double digit int test" {
         val command = "42"
         val tokens = tokenizer.tokenize(command)
         tokens[0] shouldBe InfluxToken(TokenType.NUMBER, "42")
         tokens.size shouldBe 1
     }
 
-    "float test" {
-        val command = "42.0"
+    "zero float test" {
+        val command = "0.0"
         val tokens = tokenizer.tokenize(command)
-        tokens[0] shouldBe InfluxToken(TokenType.NUMBER, "42.0")
+        tokens[0] shouldBe InfluxToken(TokenType.NUMBER, "0.0")
+        tokens.size shouldBe 1
+    }
+
+    "float test" {
+        val command = "42.420"
+        val tokens = tokenizer.tokenize(command)
+        tokens[0] shouldBe InfluxToken(TokenType.NUMBER, "42.420")
         tokens.size shouldBe 1
     }
 
