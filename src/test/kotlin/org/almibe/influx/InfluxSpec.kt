@@ -19,8 +19,38 @@ under the License.
 
 package org.almibe.influx
 
+import io.kotlintest.shouldBe
 import io.kotlintest.specs.StringSpec
+import jetbrains.exodus.entitystore.PersistentEntityStore
+import jetbrains.exodus.entitystore.PersistentEntityStores
+import java.nio.file.Files
 
 class InfluxSpec : StringSpec({
+    val entityStore: PersistentEntityStore = PersistentEntityStores.newInstance(Files.createTempDirectory("tmp").toFile())!!
+    val influx = Influx(entityStore)
 
+    "support new with no properties" {
+        val command = "new User {}"
+        val result = influx.run(command)!!.first!!
+        result.type shouldBe "User"
+        result.propertyNames.size shouldBe 0
+    }
+
+    "support new with single property" {
+        val command = "new User { age: 54 }"
+        val result = influx.run(command)!!.first!!
+        result.type shouldBe "User"
+        result.getProperty("age") shouldBe 54
+        result.propertyNames.size shouldBe 1
+    }
+
+    "support new with multiple properties" {
+        val command = "new User { name: \"Bob\", username: \"bob\", age: 54 }"
+        val result = influx.run(command)!!.first!!
+        result.type shouldBe "User"
+        result.getProperty("age") shouldBe 54
+        result.getProperty("name") shouldBe "Bob"
+        result.getProperty("username") shouldBe "bob"
+        result.propertyNames.size shouldBe 3
+    }
 })

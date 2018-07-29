@@ -43,7 +43,7 @@ class Influx(private val entityStore: PersistentEntityStore) {
             firstToken.tokenContent == "find" -> {
                 handleFind(itr)
             }
-            else -> null
+            else -> throw RuntimeException("Only new and find commands supported -- $command")
         }
     }
 

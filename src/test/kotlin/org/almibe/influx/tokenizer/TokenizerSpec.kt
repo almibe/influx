@@ -198,6 +198,5 @@ class TokenizerSpec : StringSpec({
         tokens[3] shouldBe InfluxToken(TokenType.IDENTITY, "User#76")
         tokens[4] shouldBe InfluxToken(TokenType.END_BRACE, "}")
         tokens.size shouldBe 5
-
     }
 })
