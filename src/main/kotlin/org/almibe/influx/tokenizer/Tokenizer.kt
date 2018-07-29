@@ -52,26 +52,29 @@ class Tokenizer {
 
     private fun checkKeyword(firstChar: Char, itr: Iterator<Char>, tokens: MutableList<InfluxToken>) {
         val keyword = StringBuilder(firstChar.toString())
-
         if (!itr.hasNext()) {
             tokens.add(InfluxToken(TokenType.KEYWORD, keyword.toString()))
             return
         }
-
         var currentChar = itr.next()
-        //TODO if I add identity as a token type also check for # here
-        //TODO and then use regex checks to see what the final type is similar to what I did with numbers
-        while (currentChar in 'a'..'z' || currentChar in 'A'..'Z' || currentChar in '0'..'9') {
+        while (currentChar in 'a'..'z' || currentChar in 'A'..'Z' || currentChar in '0'..'9' || currentChar == '#') {
             keyword.append(currentChar)
             if (itr.hasNext()) {
                 currentChar = itr.next()
             } else {
-                tokens.add(InfluxToken(TokenType.KEYWORD, keyword.toString()))
-                return
+                break
             }
         }
-        tokens.add(InfluxToken(TokenType.KEYWORD, keyword.toString()))
-        startNextToken(currentChar, itr, tokens)
+
+        when {
+            keyword.matches(Regex("[a-zA-Z0-9]+")) -> tokens.add(InfluxToken(TokenType.KEYWORD, keyword.toString()))
+            keyword.matches(Regex("[a-zA-Z0-9]+#[0-9]+")) -> tokens.add(InfluxToken(TokenType.IDENTITY, keyword.toString()))
+            else -> throw RuntimeException("Keyword or Identity incorrectly formed $keyword.")
+        }
+
+        if (itr.hasNext()) {
+            startNextToken(currentChar, itr, tokens)
+        }
     }
 
     private fun checkString(itr: Iterator<Char>, tokens: MutableList<InfluxToken>) {
