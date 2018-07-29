@@ -22,17 +22,5 @@ package org.almibe.influx
 import io.kotlintest.specs.StringSpec
 
 class InfluxSpec : StringSpec({
-    "test basic access" {
-        EntityStoreInstance.entityStore.executeInReadonlyTransaction {
-            val gb = it.find("VideoGameSystem", "name","Game Boy").first!!
-            assert(gb.getProperty("name") == "Game Boy")
-            assert(gb.getProperty("company") == "Nintendo")
-            assert(gb.getLink("company")?.getProperty("name") == "Nintendo")
-            assert(gb.getLinks("company").first!!.getProperty("name") == "Nintendo")
-        }
-    }
-
-
-
 
 })

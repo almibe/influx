@@ -21,9 +21,16 @@ package org.almibe.influx
 
 import jetbrains.exodus.entitystore.EntityIterable
 import jetbrains.exodus.entitystore.PersistentEntityStore
+import org.almibe.influx.tokenizer.Tokenizer
 
 class Influx(private val entityStore: PersistentEntityStore) {
+    private val tokenizer = Tokenizer()
+
     fun run(command: String): EntityIterable? {
+        val itr = tokenizer.tokenize(command).iterator()
+
+
+
         return null
     }
 }
