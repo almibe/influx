@@ -34,10 +34,10 @@ class Tokenizer {
     private fun startNextToken(currentChar: Char, itr: Iterator<Char>, tokens: MutableList<InfluxToken>) {
         when (currentChar) {
             //single character checks
-            ':' -> InfluxToken(TokenType.COLON, ":")
-            '{' -> InfluxToken(TokenType.START_BRACE, "{")
-            '}' -> InfluxToken(TokenType.END_BRACE, "}")
-            ',' -> InfluxToken(TokenType.COMMA, ",")
+            ':' -> tokens.add(InfluxToken(TokenType.COLON, ":"))
+            '{' -> tokens.add(InfluxToken(TokenType.START_BRACE, "{"))
+            '}' -> tokens.add(InfluxToken(TokenType.END_BRACE, "}"))
+            ',' -> tokens.add(InfluxToken(TokenType.COMMA, ","))
             //multi character checks
             in 'a'..'z' -> checkKeyword(currentChar, itr, tokens)
             in 'A'..'Z' -> checkKeyword(currentChar, itr, tokens)
