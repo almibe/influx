@@ -36,14 +36,14 @@ class TokenizerSpec : StringSpec({
         val command = "find"
         val tokens = tokenizer.tokenize(command)
         tokens[0] shouldBe InfluxToken(TokenType.KEYWORD, "find")
-        tokens.size shouldBe null
+        tokens.size shouldBe 1
     }
 
     "string test" {
         val command = "\"string\""
         val tokens = tokenizer.tokenize(command)
         tokens[0] shouldBe InfluxToken(TokenType.STRING, "string")
-        tokens.size shouldBe null
+        tokens.size shouldBe 1
     }
 
     "punctuation test" {
@@ -55,7 +55,7 @@ class TokenizerSpec : StringSpec({
         tokens[3] shouldBe InfluxToken(TokenType.COMMA, ",")
         tokens[4] shouldBe InfluxToken(TokenType.START_BRACE, "{")
         tokens[5] shouldBe InfluxToken(TokenType.END_BRACE, "}")
-        tokens.size shouldBe null
+        tokens.size shouldBe 6
     }
 
     "new command test" {
@@ -72,6 +72,6 @@ class TokenizerSpec : StringSpec({
         tokens[8] shouldBe InfluxToken(TokenType.COLON, ":")
         tokens[9] shouldBe InfluxToken(TokenType.NUMBER, "42")
         tokens[10] shouldBe InfluxToken(TokenType.END_BRACE, "}")
-        tokens.size shouldBe null
+        tokens.size shouldBe 11
     }
 })
