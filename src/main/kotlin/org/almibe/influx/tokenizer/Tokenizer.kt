@@ -56,12 +56,13 @@ class Tokenizer {
             tokens.add(InfluxToken(TokenType.KEYWORD, keyword.toString()))
             return
         }
-        var currentChar = itr.next()
+        var currentChar: Char? = itr.next()
         while (currentChar in 'a'..'z' || currentChar in 'A'..'Z' || currentChar in '0'..'9' || currentChar == '#') {
             keyword.append(currentChar)
             if (itr.hasNext()) {
                 currentChar = itr.next()
             } else {
+                currentChar = null
                 break
             }
         }
@@ -72,7 +73,7 @@ class Tokenizer {
             else -> throw RuntimeException("Keyword or Identity incorrectly formed $keyword.")
         }
 
-        if (itr.hasNext()) {
+        if (currentChar != null) {
             startNextToken(currentChar, itr, tokens)
         }
     }
