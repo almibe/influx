@@ -116,11 +116,15 @@ class Tokenizer {
     }
 
     private fun checkArrow(firstChar: Char, itr: Iterator<Char>, tokens: MutableList<InfluxToken>) {
-        if (firstChar == '-') {
-            //TODO finish
-        }
-        if (firstChar == '=') {
-            //TODO finish
+        if (itr.hasNext() && itr.next() == '>') {
+            if (firstChar == '-') {
+                tokens.add(InfluxToken(TokenType.ARROW, "->"))
+            }
+            if (firstChar == '=') {
+                tokens.add(InfluxToken(TokenType.FAT_ARROW, "=>"))
+            }
+        } else {
+            throw RuntimeException("Incorrectly formed arrow.")
         }
         if (itr.hasNext()) {
             startNextToken(itr.next(), itr, tokens)
