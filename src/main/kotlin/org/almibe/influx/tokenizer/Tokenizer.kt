@@ -93,7 +93,26 @@ class Tokenizer {
     }
 
     private fun checkNumber(firstChar: Char, itr: Iterator<Char>, tokens: MutableList<InfluxToken>) {
+        val number = StringBuilder(firstChar.toString())
 
+        if (!itr.hasNext()) {
+            tokens.add(InfluxToken(TokenType.NUMBER, number.toString()))
+        } else {
+            var currentChar = itr.next()
+            while (currentChar in '0'..'9' || currentChar == '.') {
+                number.append(currentChar)
+                if (itr.hasNext()) {
+                    currentChar = itr.next()
+                } else {
+                    break
+                }
+            }
+            when {
+                number.matches(Regex("[0-9]+")) -> tokens.add(InfluxToken(TokenType.NUMBER, number.toString()))
+                number.matches(Regex("[0-9]+\\.[0-9]+")) -> tokens.add(InfluxToken(TokenType.NUMBER, number.toString()))
+                else -> throw RuntimeException("Number incorrectly formed $number.")
+            }
+        }
     }
 
     private fun checkArrow(firstChar: Char, itr: Iterator<Char>, tokens: MutableList<InfluxToken>) {
