@@ -55,42 +55,35 @@ class Tokenizer {
 
         if (!itr.hasNext()) {
             tokens.add(InfluxToken(TokenType.KEYWORD, keyword.toString()))
-        }
-
-        var currentChar = itr.next()
-
-        while (currentChar in 'a'..'z' || currentChar in 'A'..'Z' || currentChar in '0'..'9') {
-            keyword.append(currentChar)
-            if (itr.hasNext()) {
-                currentChar = itr.next()
-            } else {
-                break
+        } else {
+            var currentChar = itr.next()
+            while (currentChar in 'a'..'z' || currentChar in 'A'..'Z' || currentChar in '0'..'9') {
+                keyword.append(currentChar)
+                if (itr.hasNext()) {
+                    currentChar = itr.next()
+                } else {
+                    break
+                }
             }
+            tokens.add(InfluxToken(TokenType.KEYWORD, keyword.toString()))
         }
-
-        tokens.add(InfluxToken(TokenType.KEYWORD, keyword.toString()))
     }
 
     private fun checkString(firstChar: Char, itr: Iterator<Char>, tokens: MutableList<InfluxToken>) {
-//        val keyword = StringBuilder()
-//
-//        if (currentCharPos < length) {
-//            currentChar = command[currentCharPos]
-//            currentCharPos++
-//        } else {
-//            return null
-//        }
-//
-//        while (currentChar!! in 'a'..'z' || currentChar!! in 'A'..'Z' || currentChar!! in '0'..'9') {
-//            keyword.append(currentChar!!)
-//            if (currentCharPos < length) {
-//                currentChar = command[currentCharPos]
-//                currentCharPos++
-//            } else {
-//                break
-//            }
-//        }
-//        return InfluxToken(TokenType.KEYWORD, keyword.toString())
+        val keyword = StringBuilder() //ignore firstChar since it will always be '"'
+
+        while (itr.hasNext()) {
+            var currentChar = itr.next()
+            if (currentChar == '"') {
+                //TODO handle end of string
+            } else if(currentChar == '\\') {
+                //TODO handle escape char
+            } else {
+                keyword.append(currentChar)
+            }
+        }
+
+
     }
 
     private fun checkNumber(firstChar: Char, itr: Iterator<Char>, tokens: MutableList<InfluxToken>) {
