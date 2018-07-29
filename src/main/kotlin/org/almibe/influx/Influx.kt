@@ -34,18 +34,23 @@ class Influx(private val entityStore: PersistentEntityStore) {
             return null
         }
         val firstToken = itr.next()
-        when {
+        return when {
             firstToken.tokenType != TokenType.KEYWORD -> return null
             firstToken.tokenContent == "new" -> {
-
+                handleNew()
             }
             firstToken.tokenContent == "find" -> {
-
+                handleFind()
             }
-            else -> return null
+            else -> null
         }
+    }
 
+    private fun handleNew(): EntityIterable? {
+        return null
+    }
 
+    private fun handleFind(): EntityIterable? {
         return null
     }
 }
