@@ -21,6 +21,7 @@ package org.almibe.influx
 
 import jetbrains.exodus.entitystore.EntityIterable
 import jetbrains.exodus.entitystore.PersistentEntityStore
+import org.almibe.influx.tokenizer.TokenType
 import org.almibe.influx.tokenizer.Tokenizer
 
 class Influx(private val entityStore: PersistentEntityStore) {
@@ -29,6 +30,20 @@ class Influx(private val entityStore: PersistentEntityStore) {
     fun run(command: String): EntityIterable? {
         val itr = tokenizer.tokenize(command).iterator()
 
+        if (!itr.hasNext()) {
+            return null
+        }
+        val firstToken = itr.next()
+        when {
+            firstToken.tokenType != TokenType.KEYWORD -> return null
+            firstToken.tokenContent == "new" -> {
+
+            }
+            firstToken.tokenContent == "find" -> {
+
+            }
+            else -> return null
+        }
 
 
         return null
