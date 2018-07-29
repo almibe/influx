@@ -72,6 +72,18 @@ class TokenizerSpec : StringSpec({
         tokens.size shouldBe 6
     }
 
+    "punctuation with spaces test" {
+        val command = " : -> => , {  } "
+        val tokens = tokenizer.tokenize(command)
+        tokens[0] shouldBe InfluxToken(TokenType.COLON, ":")
+        tokens[1] shouldBe InfluxToken(TokenType.ARROW, "->")
+        tokens[2] shouldBe InfluxToken(TokenType.FAT_ARROW, "=>")
+        tokens[3] shouldBe InfluxToken(TokenType.COMMA, ",")
+        tokens[4] shouldBe InfluxToken(TokenType.START_BRACE, "{")
+        tokens[5] shouldBe InfluxToken(TokenType.END_BRACE, "}")
+        tokens.size shouldBe 6
+    }
+
     "new command test" {
         val command = "new User { name: \"Bob\", age:42 } "
         val tokens = tokenizer.tokenize(command)
