@@ -28,7 +28,8 @@ enum class TokenType {
     COLON,
     START_BRACE,
     END_BRACE,
-    COMMA
+    COMMA,
+    IDENTITY
 }
 
 data class InfluxToken(val tokenType: TokenType, val tokenContent: String)

@@ -21,6 +21,7 @@ package org.almibe.influx
 
 import jetbrains.exodus.entitystore.EntityIterable
 import jetbrains.exodus.entitystore.PersistentEntityStore
+import org.almibe.influx.tokenizer.InfluxToken
 import org.almibe.influx.tokenizer.TokenType
 import org.almibe.influx.tokenizer.Tokenizer
 
@@ -37,20 +38,20 @@ class Influx(private val entityStore: PersistentEntityStore) {
         return when {
             firstToken.tokenType != TokenType.KEYWORD -> return null
             firstToken.tokenContent == "new" -> {
-                handleNew()
+                handleNew(itr)
             }
             firstToken.tokenContent == "find" -> {
-                handleFind()
+                handleFind(itr)
             }
             else -> null
         }
     }
 
-    private fun handleNew(): EntityIterable? {
-        return null
+    private fun handleNew(itr: Iterator<InfluxToken>): EntityIterable? {
+        TODO()
     }
 
-    private fun handleFind(): EntityIterable? {
-        return null
+    private fun handleFind(itr: Iterator<InfluxToken>): EntityIterable? {
+        TODO()
     }
 }

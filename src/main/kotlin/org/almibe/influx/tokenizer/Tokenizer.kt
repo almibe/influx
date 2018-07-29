@@ -59,6 +59,8 @@ class Tokenizer {
         }
 
         var currentChar = itr.next()
+        //TODO if I add identity as a token type also check for # here
+        //TODO and then use regex checks to see what the final type is similar to what I did with numbers
         while (currentChar in 'a'..'z' || currentChar in 'A'..'Z' || currentChar in '0'..'9') {
             keyword.append(currentChar)
             if (itr.hasNext()) {
