@@ -82,7 +82,6 @@ class Tokenizer {
                 keyword.append(currentChar)
             }
         }
-
         if (currentChar == '"') {
             tokens.add(InfluxToken(TokenType.STRING, keyword.toString()))
             if (itr.hasNext()) {
