@@ -55,18 +55,21 @@ class Tokenizer {
 
         if (!itr.hasNext()) {
             tokens.add(InfluxToken(TokenType.KEYWORD, keyword.toString()))
-        } else {
-            var currentChar = itr.next()
-            while (currentChar in 'a'..'z' || currentChar in 'A'..'Z' || currentChar in '0'..'9') {
-                keyword.append(currentChar)
-                if (itr.hasNext()) {
-                    currentChar = itr.next()
-                } else {
-                    break
-                }
-            }
-            tokens.add(InfluxToken(TokenType.KEYWORD, keyword.toString()))
+            return
         }
+
+        var currentChar = itr.next()
+        while (currentChar in 'a'..'z' || currentChar in 'A'..'Z' || currentChar in '0'..'9') {
+            keyword.append(currentChar)
+            if (itr.hasNext()) {
+                currentChar = itr.next()
+            } else {
+                tokens.add(InfluxToken(TokenType.KEYWORD, keyword.toString()))
+                return
+            }
+        }
+        tokens.add(InfluxToken(TokenType.KEYWORD, keyword.toString()))
+        startNextToken(currentChar, itr, tokens)
     }
 
     private fun checkString(itr: Iterator<Char>, tokens: MutableList<InfluxToken>) {
