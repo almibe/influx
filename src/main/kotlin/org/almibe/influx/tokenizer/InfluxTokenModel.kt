@@ -17,7 +17,7 @@ specific language governing permissions and limitations
 under the License.
 */
 
-package org.almibe.influx.lexer
+package org.almibe.influx.tokenizer
 
 enum class TokenType {
     STRING,
