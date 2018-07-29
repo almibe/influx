@@ -119,7 +119,7 @@ class TokenizerSpec : StringSpec({
         tokens[1] shouldBe InfluxToken(TokenType.KEYWORD, "name")
         tokens[2] shouldBe InfluxToken(TokenType.COLON, ":")
         tokens[3] shouldBe InfluxToken(TokenType.STRING, "Bob")
-        tokens[5] shouldBe InfluxToken(TokenType.END_BRACE, "}")
+        tokens[4] shouldBe InfluxToken(TokenType.END_BRACE, "}")
         tokens.size shouldBe 5
     }
 
@@ -130,7 +130,7 @@ class TokenizerSpec : StringSpec({
         tokens[1] shouldBe InfluxToken(TokenType.KEYWORD, "age")
         tokens[2] shouldBe InfluxToken(TokenType.COLON, ":")
         tokens[3] shouldBe InfluxToken(TokenType.NUMBER, "42")
-        tokens[5] shouldBe InfluxToken(TokenType.END_BRACE, "}")
+        tokens[4] shouldBe InfluxToken(TokenType.END_BRACE, "}")
         tokens.size shouldBe 5
     }
 
@@ -141,7 +141,7 @@ class TokenizerSpec : StringSpec({
         tokens[1] shouldBe InfluxToken(TokenType.KEYWORD, "company")
         tokens[2] shouldBe InfluxToken(TokenType.ARROW, "->")
         tokens[3] shouldBe InfluxToken(TokenType.KEYWORD, "nintendo")
-        tokens[5] shouldBe InfluxToken(TokenType.END_BRACE, "}")
+        tokens[4] shouldBe InfluxToken(TokenType.END_BRACE, "}")
         tokens.size shouldBe 5
     }
 
@@ -152,7 +152,7 @@ class TokenizerSpec : StringSpec({
         tokens[1] shouldBe InfluxToken(TokenType.KEYWORD, "company")
         tokens[2] shouldBe InfluxToken(TokenType.FAT_ARROW, "=>")
         tokens[3] shouldBe InfluxToken(TokenType.KEYWORD, "nintendo")
-        tokens[5] shouldBe InfluxToken(TokenType.END_BRACE, "}")
+        tokens[4] shouldBe InfluxToken(TokenType.END_BRACE, "}")
         tokens.size shouldBe 5
     }
 
