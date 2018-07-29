@@ -60,6 +60,20 @@ class TokenizerSpec : StringSpec({
         tokens.size shouldBe 1
     }
 
+    "arrow test" {
+        val command = " -> "
+        val tokens = tokenizer.tokenize(command)
+        tokens[0] shouldBe InfluxToken(TokenType.ARROW, "->")
+        tokens.size shouldBe 1
+    }
+
+    "fat arrow test" {
+        val command = " => "
+        val tokens = tokenizer.tokenize(command)
+        tokens[0] shouldBe InfluxToken(TokenType.FAT_ARROW, "=>")
+        tokens.size shouldBe 1
+    }
+
     "punctuation test" {
         val command = ":->=>,{}"
         val tokens = tokenizer.tokenize(command)
