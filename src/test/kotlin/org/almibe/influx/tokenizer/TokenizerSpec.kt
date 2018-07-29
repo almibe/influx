@@ -183,7 +183,7 @@ class TokenizerSpec : StringSpec({
     "arrow to identity test" {
         val command = "user->User#76"
         val tokens = tokenizer.tokenize(command)
-        tokens[0] shouldBe InfluxToken(TokenType.KEYWORD, "User")
+        tokens[0] shouldBe InfluxToken(TokenType.KEYWORD, "user")
         tokens[1] shouldBe InfluxToken(TokenType.ARROW, "->")
         tokens[2] shouldBe InfluxToken(TokenType.IDENTITY, "User#76")
         tokens.size shouldBe 3
@@ -193,7 +193,7 @@ class TokenizerSpec : StringSpec({
         val command = "  {  user => User#76}"
         val tokens = tokenizer.tokenize(command)
         tokens[0] shouldBe InfluxToken(TokenType.START_BRACE, "{")
-        tokens[1] shouldBe InfluxToken(TokenType.KEYWORD, "User")
+        tokens[1] shouldBe InfluxToken(TokenType.KEYWORD, "user")
         tokens[2] shouldBe InfluxToken(TokenType.FAT_ARROW, "=>")
         tokens[3] shouldBe InfluxToken(TokenType.IDENTITY, "User#76")
         tokens[4] shouldBe InfluxToken(TokenType.END_BRACE, "}")
