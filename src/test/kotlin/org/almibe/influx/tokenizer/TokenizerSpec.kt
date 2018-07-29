@@ -112,6 +112,50 @@ class TokenizerSpec : StringSpec({
         tokens.size shouldBe 6
     }
 
+    "colon assignment without spaces" {
+        val command = "{name:\"Bob\"}"
+        val tokens = tokenizer.tokenize(command)
+        tokens[0] shouldBe InfluxToken(TokenType.START_BRACE, "{")
+        tokens[1] shouldBe InfluxToken(TokenType.KEYWORD, "name")
+        tokens[2] shouldBe InfluxToken(TokenType.COLON, ":")
+        tokens[3] shouldBe InfluxToken(TokenType.STRING, "Bob")
+        tokens[5] shouldBe InfluxToken(TokenType.END_BRACE, "}")
+        tokens.size shouldBe 5
+    }
+
+    "colon assignment with spaces" {
+        val command = " { age : 42 }"
+        val tokens = tokenizer.tokenize(command)
+        tokens[0] shouldBe InfluxToken(TokenType.START_BRACE, "{")
+        tokens[1] shouldBe InfluxToken(TokenType.KEYWORD, "age")
+        tokens[2] shouldBe InfluxToken(TokenType.COLON, ":")
+        tokens[3] shouldBe InfluxToken(TokenType.NUMBER, "42")
+        tokens[5] shouldBe InfluxToken(TokenType.END_BRACE, "}")
+        tokens.size shouldBe 5
+    }
+
+    "arrow assignment without spaces" {
+        val command = "{company->nintendo}"
+        val tokens = tokenizer.tokenize(command)
+        tokens[0] shouldBe InfluxToken(TokenType.START_BRACE, "{")
+        tokens[1] shouldBe InfluxToken(TokenType.KEYWORD, "company")
+        tokens[2] shouldBe InfluxToken(TokenType.ARROW, "->")
+        tokens[3] shouldBe InfluxToken(TokenType.KEYWORD, "nintendo")
+        tokens[5] shouldBe InfluxToken(TokenType.END_BRACE, "}")
+        tokens.size shouldBe 5
+    }
+
+    "fat arrow assignment with spaces" {
+        val command = "  { company => nintendo  }    "
+        val tokens = tokenizer.tokenize(command)
+        tokens[0] shouldBe InfluxToken(TokenType.START_BRACE, "{")
+        tokens[1] shouldBe InfluxToken(TokenType.KEYWORD, "company")
+        tokens[2] shouldBe InfluxToken(TokenType.FAT_ARROW, "=>")
+        tokens[3] shouldBe InfluxToken(TokenType.KEYWORD, "nintendo")
+        tokens[5] shouldBe InfluxToken(TokenType.END_BRACE, "}")
+        tokens.size shouldBe 5
+    }
+
     "new command test" {
         val command = "new User { name: \"Bob\", age:42 } "
         val tokens = tokenizer.tokenize(command)
