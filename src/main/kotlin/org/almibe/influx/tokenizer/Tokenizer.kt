@@ -23,34 +23,55 @@ class Tokenizer {
     fun tokenize(command: String): List<InfluxToken> {
         val tokens = mutableListOf<InfluxToken>()
         val itr = command.iterator()
-        while(itr.hasNext()) {
-            val currentChar = itr.nextChar()
-            val token = when (currentChar) {
-                //single character checks
-                ':' -> InfluxToken(TokenType.COLON, ":")
-                '{' -> InfluxToken(TokenType.START_BRACE, "{")
-                '}' -> InfluxToken(TokenType.END_BRACE, "}")
-                ',' -> InfluxToken(TokenType.COMMA, ",")
-                //multi character checks
-                '"' -> checkString(itr)
-                in '0'..'9' -> checkNumber(itr)
-                in 'a'..'z' -> checkKeyword(itr)
-                in 'A'..'Z' -> checkKeyword(itr)
-                '-', '=' -> checkArrow(itr)
-                else -> null
-            }
-            if (token != null) {
-                tokens.add(token)
-            } else if (itr.hasNext()) {
-                continue
+
+        if (itr.hasNext()) {
+            startNextToken(itr.nextChar(), itr, tokens)
+        }
+
+        return tokens.toList()
+    }
+
+    private fun startNextToken(currentChar: Char, itr: Iterator<Char>, tokens: MutableList<InfluxToken>) {
+        when (currentChar) {
+            //single character checks
+            ':' -> InfluxToken(TokenType.COLON, ":")
+            '{' -> InfluxToken(TokenType.START_BRACE, "{")
+            '}' -> InfluxToken(TokenType.END_BRACE, "}")
+            ',' -> InfluxToken(TokenType.COMMA, ",")
+            //multi character checks
+            in 'a'..'z' -> checkKeyword(currentChar, itr, tokens)
+            in 'A'..'Z' -> checkKeyword(currentChar, itr, tokens)
+            '"' -> checkString(currentChar, itr, tokens)
+            in '0'..'9' -> checkNumber(currentChar, itr, tokens)
+            '-', '=' -> checkArrow(currentChar, itr, tokens)
+        }
+        if (itr.hasNext()) {
+            startNextToken(itr.next(), itr, tokens)
+        }
+    }
+
+    private fun checkKeyword(firstChar: Char, itr: Iterator<Char>, tokens: MutableList<InfluxToken>) {
+        val keyword = StringBuilder(firstChar.toString())
+
+        if (!itr.hasNext()) {
+            tokens.add(InfluxToken(TokenType.KEYWORD, keyword.toString()))
+        }
+
+        var currentChar = itr.next()
+
+        while (currentChar in 'a'..'z' || currentChar in 'A'..'Z' || currentChar in '0'..'9') {
+            keyword.append(currentChar)
+            if (itr.hasNext()) {
+                currentChar = itr.next()
             } else {
                 break
             }
         }
-        return tokens.toList()
+
+        tokens.add(InfluxToken(TokenType.KEYWORD, keyword.toString()))
     }
 
-    private fun checkString(itr: Iterator<Char>): InfluxToken? {
+    private fun checkString(firstChar: Char, itr: Iterator<Char>, tokens: MutableList<InfluxToken>) {
 //        val keyword = StringBuilder()
 //
 //        if (currentCharPos < length) {
@@ -70,29 +91,13 @@ class Tokenizer {
 //            }
 //        }
 //        return InfluxToken(TokenType.KEYWORD, keyword.toString())
-        return null
     }
 
-    private fun checkNumber(itr: Iterator<Char>): InfluxToken? {
-        return null
+    private fun checkNumber(firstChar: Char, itr: Iterator<Char>, tokens: MutableList<InfluxToken>) {
+
     }
 
-    private fun checkKeyword(itr: Iterator<Char>): InfluxToken? {
-//        val keyword = StringBuilder()
-//        while (currentChar in 'a'..'z' || currentChar in 'A'..'Z' || currentChar in '0'..'9') {
-//            keyword.append(currentChar)
-//            if (currentCharPos < length) {
-//                currentChar = command[currentCharPos]
-//                currentCharPos++
-//            } else {
-//                break
-//            }
-//        }
-//        return InfluxToken(TokenType.KEYWORD, keyword.toString())
-        return null
-    }
+    private fun checkArrow(firstChar: Char, itr: Iterator<Char>, tokens: MutableList<InfluxToken>) {
 
-    private fun checkArrow(itr: Iterator<Char>): InfluxToken? {
-        return null
     }
 }

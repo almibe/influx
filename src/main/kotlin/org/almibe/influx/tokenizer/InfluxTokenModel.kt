@@ -32,4 +32,3 @@ enum class TokenType {
 }
 
 data class InfluxToken(val tokenType: TokenType, val tokenContent: String)
-
