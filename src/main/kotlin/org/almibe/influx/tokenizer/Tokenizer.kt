@@ -41,7 +41,7 @@ class Tokenizer {
             //multi character checks
             in 'a'..'z' -> checkKeyword(currentChar, itr, tokens)
             in 'A'..'Z' -> checkKeyword(currentChar, itr, tokens)
-            '"' -> checkString(currentChar, itr, tokens)
+            '"' -> checkString(itr, tokens)
             in '0'..'9' -> checkNumber(currentChar, itr, tokens)
             '-', '=' -> checkArrow(currentChar, itr, tokens)
         }
@@ -69,13 +69,13 @@ class Tokenizer {
         }
     }
 
-    private fun checkString(firstChar: Char, itr: Iterator<Char>, tokens: MutableList<InfluxToken>) {
-        val keyword = StringBuilder() //ignore firstChar since it will always be '"'
-
+    private fun checkString(itr: Iterator<Char>, tokens: MutableList<InfluxToken>) {
+        val keyword = StringBuilder()
+        var currentChar: Char? = null
         while (itr.hasNext()) {
-            var currentChar = itr.next()
+             currentChar = itr.next()
             if (currentChar == '"') {
-                //TODO handle end of string
+                break
             } else if(currentChar == '\\') {
                 //TODO handle escape char
             } else {
@@ -83,7 +83,14 @@ class Tokenizer {
             }
         }
 
-
+        if (currentChar == '"') {
+            tokens.add(InfluxToken(TokenType.STRING, keyword.toString()))
+            if (itr.hasNext()) {
+                startNextToken(itr.next(), itr, tokens)
+            }
+        } else {
+            throw RuntimeException("String not closed.")
+        }
     }
 
     private fun checkNumber(firstChar: Char, itr: Iterator<Char>, tokens: MutableList<InfluxToken>) {
@@ -91,6 +98,14 @@ class Tokenizer {
     }
 
     private fun checkArrow(firstChar: Char, itr: Iterator<Char>, tokens: MutableList<InfluxToken>) {
-
+        if (firstChar == '-') {
+            //TODO finish
+        }
+        if (firstChar == '=') {
+            //TODO finish
+        }
+        if (itr.hasNext()) {
+            startNextToken(itr.next(), itr, tokens)
+        }
     }
 }
