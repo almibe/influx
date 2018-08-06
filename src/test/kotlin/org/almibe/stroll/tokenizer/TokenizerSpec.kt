@@ -89,27 +89,32 @@ class TokenizerSpec : StringSpec({
     }
 
     "punctuation test" {
-        val command = ":->=>,{}"
+        val command = ":->=>,][{}"
         val tokens = tokenizer.tokenize(command)
         tokens[0] shouldBe StrollToken(TokenType.COLON, ":")
         tokens[1] shouldBe StrollToken(TokenType.ARROW, "->")
         tokens[2] shouldBe StrollToken(TokenType.FAT_ARROW, "=>")
         tokens[3] shouldBe StrollToken(TokenType.COMMA, ",")
-        tokens[4] shouldBe StrollToken(TokenType.START_BRACE, "{")
-        tokens[5] shouldBe StrollToken(TokenType.END_BRACE, "}")
-        tokens.size shouldBe 6
+        tokens[4] shouldBe StrollToken(TokenType.END_BRACKET, "]")
+        tokens[5] shouldBe StrollToken(TokenType.START_BRACKET, "[")
+        tokens[6] shouldBe StrollToken(TokenType.START_BRACE, "{")
+        tokens[7] shouldBe StrollToken(TokenType.END_BRACE, "}")
+        tokens.size shouldBe 8
     }
 
     "punctuation with spaces test" {
-        val command = " : -> => , {  } "
+        val command = " : -> => , { ] } [ "
         val tokens = tokenizer.tokenize(command)
         tokens[0] shouldBe StrollToken(TokenType.COLON, ":")
         tokens[1] shouldBe StrollToken(TokenType.ARROW, "->")
         tokens[2] shouldBe StrollToken(TokenType.FAT_ARROW, "=>")
         tokens[3] shouldBe StrollToken(TokenType.COMMA, ",")
         tokens[4] shouldBe StrollToken(TokenType.START_BRACE, "{")
-        tokens[5] shouldBe StrollToken(TokenType.END_BRACE, "}")
-        tokens.size shouldBe 6
+        tokens[5] shouldBe StrollToken(TokenType.END_BRACKET, "]")
+        tokens[6] shouldBe StrollToken(TokenType.END_BRACE, "}")
+        tokens[7] shouldBe StrollToken(TokenType.START_BRACKET, "[")
+
+        tokens.size shouldBe 8
     }
 
     "colon assignment without spaces" {
@@ -146,12 +151,12 @@ class TokenizerSpec : StringSpec({
     }
 
     "fat arrow assignment with spaces" {
-        val command = "  { company => nintendo  }    "
+        val command = "  { company => Company#42  }    "
         val tokens = tokenizer.tokenize(command)
         tokens[0] shouldBe StrollToken(TokenType.START_BRACE, "{")
         tokens[1] shouldBe StrollToken(TokenType.KEYWORD, "company")
         tokens[2] shouldBe StrollToken(TokenType.FAT_ARROW, "=>")
-        tokens[3] shouldBe StrollToken(TokenType.KEYWORD, "nintendo")
+        tokens[3] shouldBe StrollToken(TokenType.IDENTITY, "Company#42")
         tokens[4] shouldBe StrollToken(TokenType.END_BRACE, "}")
         tokens.size shouldBe 5
     }
@@ -190,13 +195,17 @@ class TokenizerSpec : StringSpec({
     }
 
     "fat arrow to identity test" {
-        val command = "  {  user => User#76}"
+        val command = "  {  links => [User#76, User#45]}"
         val tokens = tokenizer.tokenize(command)
         tokens[0] shouldBe StrollToken(TokenType.START_BRACE, "{")
-        tokens[1] shouldBe StrollToken(TokenType.KEYWORD, "user")
+        tokens[1] shouldBe StrollToken(TokenType.KEYWORD, "links")
         tokens[2] shouldBe StrollToken(TokenType.FAT_ARROW, "=>")
-        tokens[3] shouldBe StrollToken(TokenType.IDENTITY, "User#76")
-        tokens[4] shouldBe StrollToken(TokenType.END_BRACE, "}")
-        tokens.size shouldBe 5
+        tokens[3] shouldBe StrollToken(TokenType.START_BRACKET, "[")
+        tokens[4] shouldBe StrollToken(TokenType.IDENTITY, "User#76")
+        tokens[5] shouldBe StrollToken(TokenType.COMMA, ",")
+        tokens[6] shouldBe StrollToken(TokenType.IDENTITY, "User#45")
+        tokens[7] shouldBe StrollToken(TokenType.END_BRACKET, "]")
+        tokens[8] shouldBe StrollToken(TokenType.END_BRACE, "}")
+        tokens.size shouldBe 9
     }
 })
