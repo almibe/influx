@@ -19,6 +19,7 @@ under the License.
 
 package org.almibe.influx
 
+import jetbrains.exodus.entitystore.EntityId
 import jetbrains.exodus.entitystore.EntityIterable
 import jetbrains.exodus.entitystore.PersistentEntityStore
 import org.almibe.influx.tokenizer.InfluxToken
@@ -28,30 +29,70 @@ import org.almibe.influx.tokenizer.Tokenizer
 class Influx(private val entityStore: PersistentEntityStore) {
     private val tokenizer = Tokenizer()
 
-    fun run(command: String): EntityIterable? {
-        val itr = tokenizer.tokenize(command).iterator()
+    private fun tokenize(command: String): Iterator<InfluxToken> = tokenizer.tokenize(command).iterator()
 
-        if (!itr.hasNext()) {
-            return null
+    fun runNew(commandString: String): EntityId? {
+        val itr: Iterator<InfluxToken> = tokenize(commandString)
+        //new User {}
+        //new User { username: "Josh"}
+        //new User { username: "Josh", id: 34, age: 56}
+        val new = itr.next()
+        assert(new.tokenType == TokenType.KEYWORD && new.tokenContent == "new")
+        val entityType: String = itr.next().tokenContent
+        val newCommand = NewCommand(entityType)
+
+        val brace = itr.next()
+        assert(brace.tokenType == TokenType.START_BRACE)
+        while (itr.hasNext()) {
+            val next = itr.next()
+            when (next.tokenType) {
+                TokenType.END_BRACE -> {
+                    if (itr.hasNext()) {
+                        return null //error
+                    } else {
+                        //ready to run command
+                    }
+                }
+                TokenType.KEYWORD -> {
+                    val propertyName = next.tokenContent
+                    val colon = itr.next()
+                    val value = itr.next()
+                    assert(colon.tokenType == TokenType.COLON)
+                    assert(value.tokenType == TokenType.NUMBER ||
+                            value.tokenType == TokenType.STRING)
+                    newCommand.properties.put(propertyName, value)
+                    val braceOrComma = itr.next()
+                    assert(braceOrComma.tokenType == TokenType.COMMA ||
+                           braceOrComma.tokenType == TokenType.END_BRACE)
+                }
+                else -> {
+                    return null
+                }
+            }
         }
-        val firstToken = itr.next()
-        return when {
-            firstToken.tokenType != TokenType.KEYWORD -> return null
-            firstToken.tokenContent == "new" -> {
-                handleNew(itr)
+
+        return entityStore.computeInTransaction { trans ->
+            val entity = trans.newEntity(newCommand.entityType)
+            newCommand.properties.forEach {
+                when (it.value.tokenType) {
+                    TokenType.NUMBER -> {}
+                    TokenType.STRING -> {}
+                    else -> {
+                        trans.abort()
+                    }
+                }
             }
-            firstToken.tokenContent == "find" -> {
-                handleFind(itr)
-            }
-            else -> throw RuntimeException("Only new and find commands supported -- $command")
+            entity.id
         }
     }
 
-    private fun handleNew(itr: Iterator<InfluxToken>): EntityIterable? {
+    fun runFind(commandString: String): EntityIterable? {
+        val itr: Iterator<InfluxToken> = tokenize(commandString)
         TODO()
     }
 
-    private fun handleFind(itr: Iterator<InfluxToken>): EntityIterable? {
+    fun handleDelete(commandString: String): EntityIterable? {
+        val itr: Iterator<InfluxToken> = tokenize(commandString)
         TODO()
     }
 }
