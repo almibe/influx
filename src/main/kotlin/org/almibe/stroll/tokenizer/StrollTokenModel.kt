@@ -17,11 +17,19 @@ specific language governing permissions and limitations
 under the License.
 */
 
-package org.almibe.influx
+package org.almibe.stroll.tokenizer
 
-import org.almibe.influx.tokenizer.InfluxToken
+enum class TokenType {
+    STRING,
+    NUMBER,
+    KEYWORD, //any character string out of quotes
+    ARROW, // -> outside of quotes
+    FAT_ARROW, // => outside of quotes
+    COLON,
+    START_BRACE,
+    END_BRACE,
+    COMMA,
+    IDENTITY
+}
 
-data class NewCommand (
-    val entityType: String,
-    val properties: MutableMap<String, InfluxToken> = mutableMapOf()
-)
+data class StrollToken(val tokenType: TokenType, val tokenContent: String)

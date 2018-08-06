@@ -17,17 +17,16 @@ specific language governing permissions and limitations
 under the License.
 */
 
-package org.almibe.influx
+package org.almibe.stroll
 
-import io.kotlintest.shouldBe
 import io.kotlintest.specs.StringSpec
 import jetbrains.exodus.entitystore.PersistentEntityStore
 import jetbrains.exodus.entitystore.PersistentEntityStores
 import java.nio.file.Files
 
-class InfluxSpec : StringSpec({
+class StrollSpec : StringSpec({
     val entityStore: PersistentEntityStore = PersistentEntityStores.newInstance(Files.createTempDirectory("tmp").toFile())!!
-    val influx = Influx(entityStore)
+    val influx = Stroll(entityStore)
 
     "support new with no properties" {
         val command = "new User {}"

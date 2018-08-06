@@ -17,11 +17,11 @@ specific language governing permissions and limitations
 under the License.
 */
 
-package org.almibe.influx.tokenizer
+package org.almibe.stroll.tokenizer
 
 class Tokenizer {
-    fun tokenize(command: String): List<InfluxToken> {
-        val tokens = mutableListOf<InfluxToken>()
+    fun tokenize(command: String): List<StrollToken> {
+        val tokens = mutableListOf<StrollToken>()
         val itr = command.iterator()
 
         if (itr.hasNext()) {
@@ -31,13 +31,13 @@ class Tokenizer {
         return tokens.toList()
     }
 
-    private fun startNextToken(currentChar: Char, itr: Iterator<Char>, tokens: MutableList<InfluxToken>) {
+    private fun startNextToken(currentChar: Char, itr: Iterator<Char>, tokens: MutableList<StrollToken>) {
         when (currentChar) {
             //single character checks
-            ':' -> tokens.add(InfluxToken(TokenType.COLON, ":"))
-            '{' -> tokens.add(InfluxToken(TokenType.START_BRACE, "{"))
-            '}' -> tokens.add(InfluxToken(TokenType.END_BRACE, "}"))
-            ',' -> tokens.add(InfluxToken(TokenType.COMMA, ","))
+            ':' -> tokens.add(StrollToken(TokenType.COLON, ":"))
+            '{' -> tokens.add(StrollToken(TokenType.START_BRACE, "{"))
+            '}' -> tokens.add(StrollToken(TokenType.END_BRACE, "}"))
+            ',' -> tokens.add(StrollToken(TokenType.COMMA, ","))
             //multi character checks
             in 'a'..'z' -> checkKeyword(currentChar, itr, tokens)
             in 'A'..'Z' -> checkKeyword(currentChar, itr, tokens)
@@ -50,10 +50,10 @@ class Tokenizer {
         }
     }
 
-    private fun checkKeyword(firstChar: Char, itr: Iterator<Char>, tokens: MutableList<InfluxToken>) {
+    private fun checkKeyword(firstChar: Char, itr: Iterator<Char>, tokens: MutableList<StrollToken>) {
         val keyword = StringBuilder(firstChar.toString())
         if (!itr.hasNext()) {
-            tokens.add(InfluxToken(TokenType.KEYWORD, keyword.toString()))
+            tokens.add(StrollToken(TokenType.KEYWORD, keyword.toString()))
             return
         }
         var currentChar: Char? = itr.next()
@@ -68,8 +68,8 @@ class Tokenizer {
         }
 
         when {
-            keyword.matches(Regex("[a-zA-Z0-9]+")) -> tokens.add(InfluxToken(TokenType.KEYWORD, keyword.toString()))
-            keyword.matches(Regex("[a-zA-Z0-9]+#[0-9]+")) -> tokens.add(InfluxToken(TokenType.IDENTITY, keyword.toString()))
+            keyword.matches(Regex("[a-zA-Z0-9]+")) -> tokens.add(StrollToken(TokenType.KEYWORD, keyword.toString()))
+            keyword.matches(Regex("[a-zA-Z0-9]+#[0-9]+")) -> tokens.add(StrollToken(TokenType.IDENTITY, keyword.toString()))
             else -> throw RuntimeException("Keyword or Identity incorrectly formed $keyword.")
         }
 
@@ -78,7 +78,7 @@ class Tokenizer {
         }
     }
 
-    private fun checkString(itr: Iterator<Char>, tokens: MutableList<InfluxToken>) {
+    private fun checkString(itr: Iterator<Char>, tokens: MutableList<StrollToken>) {
         val keyword = StringBuilder()
         var currentChar: Char? = null
         while (itr.hasNext()) {
@@ -92,7 +92,7 @@ class Tokenizer {
             }
         }
         if (currentChar == '"') {
-            tokens.add(InfluxToken(TokenType.STRING, keyword.toString()))
+            tokens.add(StrollToken(TokenType.STRING, keyword.toString()))
             if (itr.hasNext()) {
                 startNextToken(itr.next(), itr, tokens)
             }
@@ -101,11 +101,11 @@ class Tokenizer {
         }
     }
 
-    private fun checkNumber(firstChar: Char, itr: Iterator<Char>, tokens: MutableList<InfluxToken>) {
+    private fun checkNumber(firstChar: Char, itr: Iterator<Char>, tokens: MutableList<StrollToken>) {
         val number = StringBuilder(firstChar.toString())
 
         if (!itr.hasNext()) {
-            tokens.add(InfluxToken(TokenType.NUMBER, number.toString()))
+            tokens.add(StrollToken(TokenType.NUMBER, number.toString()))
         } else {
             var currentChar = itr.next()
             while (currentChar in '0'..'9' || currentChar == '.') {
@@ -117,20 +117,20 @@ class Tokenizer {
                 }
             }
             when {
-                number.matches(Regex("[0-9]+")) -> tokens.add(InfluxToken(TokenType.NUMBER, number.toString()))
-                number.matches(Regex("[0-9]+\\.[0-9]+")) -> tokens.add(InfluxToken(TokenType.NUMBER, number.toString()))
+                number.matches(Regex("[0-9]+")) -> tokens.add(StrollToken(TokenType.NUMBER, number.toString()))
+                number.matches(Regex("[0-9]+\\.[0-9]+")) -> tokens.add(StrollToken(TokenType.NUMBER, number.toString()))
                 else -> throw RuntimeException("Number incorrectly formed $number.")
             }
         }
     }
 
-    private fun checkArrow(firstChar: Char, itr: Iterator<Char>, tokens: MutableList<InfluxToken>) {
+    private fun checkArrow(firstChar: Char, itr: Iterator<Char>, tokens: MutableList<StrollToken>) {
         if (itr.hasNext() && itr.next() == '>') {
             if (firstChar == '-') {
-                tokens.add(InfluxToken(TokenType.ARROW, "->"))
+                tokens.add(StrollToken(TokenType.ARROW, "->"))
             }
             if (firstChar == '=') {
-                tokens.add(InfluxToken(TokenType.FAT_ARROW, "=>"))
+                tokens.add(StrollToken(TokenType.FAT_ARROW, "=>"))
             }
         } else {
             throw RuntimeException("Incorrectly formed arrow.")

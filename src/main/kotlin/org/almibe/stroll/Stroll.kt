@@ -17,22 +17,22 @@ specific language governing permissions and limitations
 under the License.
 */
 
-package org.almibe.influx
+package org.almibe.stroll
 
 import jetbrains.exodus.entitystore.EntityId
 import jetbrains.exodus.entitystore.EntityIterable
 import jetbrains.exodus.entitystore.PersistentEntityStore
-import org.almibe.influx.tokenizer.InfluxToken
-import org.almibe.influx.tokenizer.TokenType
-import org.almibe.influx.tokenizer.Tokenizer
+import org.almibe.stroll.tokenizer.StrollToken
+import org.almibe.stroll.tokenizer.TokenType
+import org.almibe.stroll.tokenizer.Tokenizer
 
-class Influx(private val entityStore: PersistentEntityStore) {
+class Stroll(private val entityStore: PersistentEntityStore) {
     private val tokenizer = Tokenizer()
 
-    private fun tokenize(command: String): Iterator<InfluxToken> = tokenizer.tokenize(command).iterator()
+    private fun tokenize(command: String): Iterator<StrollToken> = tokenizer.tokenize(command).iterator()
 
     fun runNew(commandString: String): EntityId? {
-        val itr: Iterator<InfluxToken> = tokenize(commandString)
+        val itr: Iterator<StrollToken> = tokenize(commandString)
         //new User {}
         //new User { username: "Josh"}
         //new User { username: "Josh", id: 34, age: 56}
@@ -87,12 +87,12 @@ class Influx(private val entityStore: PersistentEntityStore) {
     }
 
     fun runFind(commandString: String): EntityIterable? {
-        val itr: Iterator<InfluxToken> = tokenize(commandString)
+        val itr: Iterator<StrollToken> = tokenize(commandString)
         TODO()
     }
 
     fun handleDelete(commandString: String): EntityIterable? {
-        val itr: Iterator<InfluxToken> = tokenize(commandString)
+        val itr: Iterator<StrollToken> = tokenize(commandString)
         TODO()
     }
 }
