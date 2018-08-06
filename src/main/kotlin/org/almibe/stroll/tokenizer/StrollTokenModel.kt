@@ -28,6 +28,8 @@ enum class TokenType {
     COLON,
     START_BRACE,
     END_BRACE,
+    START_BRACKET,
+    END_BRACKET,
     COMMA,
     IDENTITY
 }

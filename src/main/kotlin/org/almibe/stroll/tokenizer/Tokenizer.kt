@@ -37,6 +37,8 @@ class Tokenizer {
             ':' -> tokens.add(StrollToken(TokenType.COLON, ":"))
             '{' -> tokens.add(StrollToken(TokenType.START_BRACE, "{"))
             '}' -> tokens.add(StrollToken(TokenType.END_BRACE, "}"))
+            '[' -> tokens.add(StrollToken(TokenType.START_BRACKET, "["))
+            ']' -> tokens.add(StrollToken(TokenType.END_BRACKET, "]"))
             ',' -> tokens.add(StrollToken(TokenType.COMMA, ","))
             //multi character checks
             in 'a'..'z' -> checkKeyword(currentChar, itr, tokens)
