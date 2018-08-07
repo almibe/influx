@@ -27,46 +27,46 @@ import java.nio.file.Files
 
 class StrollSpec : StringSpec({
     val entityStore: PersistentEntityStore = PersistentEntityStores.newInstance(Files.createTempDirectory("tmp").toFile())!!
-    val influx = Stroll(entityStore)
+    val stroll = Stroll(entityStore)
 
     "support new with no properties" {
         val command = "new User {}"
-        val result = influx.runNew(command)!!
+        val result = stroll.runNew(command)!!
         result.localId shouldBe 0L
         result.typeId shouldBe 0
     }
 
     "support new with single property" {
         val command = "new User { age: 54 }"
-        val result = influx.runNew(command)!!
+        val result = stroll.runNew(command)!!
         result.localId shouldBe 1L
         result.typeId shouldBe 0
     }
 
     "support new with multiple properties" {
         val command = "new User { name: \"Bob\", username: \"bob\", age: 54 }"
-        val result = influx.runNew(command)!!
+        val result = stroll.runNew(command)!!
         result.localId shouldBe 2L
         result.typeId shouldBe 0
     }
 
     "support single link in new command" {
         val command = "new User { name: \"Margret\", contact -> 0-2 }"
-        val result = influx.runNew(command)!!
+        val result = stroll.runNew(command)!!
         result.localId shouldBe 3L
         result.typeId shouldBe 0
     }
 
     "support multiple links in new command" {
         val command = "new User { name: \"Bill\", supervises => [ 0-3, 0-2 ] }"
-        val result = influx.runNew(command)!!
+        val result = stroll.runNew(command)!!
         result.localId shouldBe 4L
         result.typeId shouldBe 0
     }
 
     "support six major types" {
         val command = "new TypeTest { char: 'a', int: 3, long: 1009L, double: 3.14, string: \"Test\", boolean: true }"
-        val result = influx.runNew(command)!!
+        val result = stroll.runNew(command)!!
         result.localId shouldBe 0L
         result.typeId shouldBe 1
         val txnResult = entityStore.computeInReadonlyTransaction { txn ->
@@ -85,77 +85,77 @@ class StrollSpec : StringSpec({
 
     "add age and extra user link" {
         val command = "update 0-4 { age: 45, supervises => [ 0-1 ], supervises => 0-0 }"
-        influx.runUpdate(command)
+        stroll.runUpdate(command)
     }
 
     "replace data for 0-1" {
         val command = "update 0-1 { age:24, name: \"Lil\" }"
-        influx.runSet(command)
+        stroll.runSet(command)
     }
 
     "delete single entity" {
-        influx.runNew("new DeleteTest { }")
+        stroll.runNew("new DeleteTest { }")
         val command = "delete 2-0"
-        influx.runDelete(command)
+        stroll.runDelete(command)
     }
     "delete list of entities" {
-        influx.runNew("new DeleteTest { test: 345}")
-        influx.runNew("new DeleteTest { blah: \"Stuff\"}")
+        stroll.runNew("new DeleteTest { test: 345}")
+        stroll.runNew("new DeleteTest { blah: \"Stuff\"}")
         val command = "delete [2-1, 2-2]"
-        influx.runDelete(command)
+        stroll.runDelete(command)
     }
 
     "test that all DeleteTest entites have been deleted" {
         val command = "find DeleteTest {}"
-        val result = influx.runFind(command)!!
+        val result = stroll.runFind(command)!!
         result.size shouldBe 0
     }
     "test finding all Users" {
         val command = "find User {}"
-        val result = influx.runFind(command)!!
+        val result = stroll.runFind(command)!!
         result.size shouldBe 5
     }
     "test finding User based on properties" {
         val command = "find User { age: 24 }"
-        val result = influx.runFind(command)!!
+        val result = stroll.runFind(command)!!
         result.size shouldBe 1
 
         val command2 = "find User { name: \"Bill\", age: 45 }"
-        val result2 = influx.runFind(command2)!!
+        val result2 = stroll.runFind(command2)!!
         result2.size shouldBe 1
     }
 
     "test finding User based on links" {
         val command = "find User { supervises => [ 0-1, 0-3 ] }"
-        val result = influx.runFind(command)!!
+        val result = stroll.runFind(command)!!
         result.size shouldBe 1
 
         val command2 = "find User { contact -> 0-2, name: \"Margret\" }"
-        val result2 = influx.runFind(command2)!!
+        val result2 = stroll.runFind(command2)!!
         result2.size shouldBe 1
     }
 
     "test finding Users with property and link exists queries" {
         val command = "find User { supervises => _ }"
-        val result = influx.runFind(command)!!
+        val result = stroll.runFind(command)!!
         result.size shouldBe 1
 
         val command1 = "find User { supervises -> _ }"
-        val result1 = influx.runFind(command1)!!
+        val result1 = stroll.runFind(command1)!!
         result1.size shouldBe 1
 
         val command2 = "find User { username: _ }"
-        val result2 = influx.runFind(command2)!!
+        val result2 = stroll.runFind(command2)!!
         result2.size shouldBe 1
     }
 
     "test using startsWith" {
         val command = "find User { name: startsWith \"Ma\" }"
-        val result = influx.runFind(command)!!
+        val result = stroll.runFind(command)!!
         result.size shouldBe 1
 
         val command1 = "find User { name: startsWith \"B\" }"
-        val result1 = influx.runFind(command1)!!
+        val result1 = stroll.runFind(command1)!!
         result1.size shouldBe 2
     }
 })
