@@ -22,6 +22,7 @@ package org.almibe.stroll
 import jetbrains.exodus.entitystore.Entity
 import jetbrains.exodus.entitystore.EntityId
 import jetbrains.exodus.entitystore.PersistentEntityStore
+import jetbrains.exodus.entitystore.StoreTransaction
 import org.almibe.stroll.tokenizer.StrollToken
 import org.almibe.stroll.tokenizer.TokenType
 import org.almibe.stroll.tokenizer.Tokenizer
@@ -37,31 +38,9 @@ class Stroll(private val entityStore: PersistentEntityStore) {
 
     private fun tokenize(command: String): Iterator<StrollToken> = tokenizer.tokenize(command).iterator()
 
-    //new,set,update,find will all use this
-    private fun readCommandArguments(itr: Iterator<StrollToken>): CommandArguments {
-        TODO()
-    }
-
-    //call this when set is used
-    private fun clearPropertiesAndLinks(entityId: EntityId) {
-        TODO()
-    }
-
-    //new,set,update will use this
-    private fun setPropertiesAndLinks(entity: Entity, commandArguments: CommandArguments) {
-        TODO()
-    }
-
-    fun runNew(commandString: String): EntityId? {
-        val itr: Iterator<StrollToken> = tokenize(commandString)
-        //new User {}
-        //new User { username: "Josh"}
-        //new User { username: "Josh", id: 34, age: 56}
-        val new = itr.next()
-        assert(new.tokenType == TokenType.KEYWORD && new.tokenContent == "new")
-        val entityType: String = itr.next().tokenContent
+    //TODO new,set,update,find will all use this
+    private fun readCommandArguments(itr: Iterator<StrollToken>): CommandArguments? {
         val commandArguments = CommandArguments()
-
         val brace = itr.next()
         assert(brace.tokenType == TokenType.START_BRACE)
         while (itr.hasNext()) {
@@ -92,7 +71,7 @@ class Stroll(private val entityStore: PersistentEntityStore) {
                             val commaOrEndBracket = itr.next()
                             assert(identity.tokenType == TokenType.IDENTITY)
                             assert(commaOrEndBracket.tokenType == TokenType.COMMA ||
-                                   commaOrEndBracket.tokenType == TokenType.END_BRACKET)
+                                    commaOrEndBracket.tokenType == TokenType.END_BRACKET)
                             commandArguments.links[propertyName] = identity
                             if (commaOrEndBracket.tokenType == TokenType.COMMA) {
                                 continue
@@ -105,41 +84,61 @@ class Stroll(private val entityStore: PersistentEntityStore) {
                     }
                     val braceOrComma = itr.next()
                     assert(braceOrComma.tokenType == TokenType.COMMA ||
-                           braceOrComma.tokenType == TokenType.END_BRACE)
+                            braceOrComma.tokenType == TokenType.END_BRACE)
                 }
                 else -> {
                     return null
                 }
             }
         }
+        return commandArguments
+    }
+
+    //TODO call this when set is used
+    private fun clearPropertiesAndLinks(entityId: EntityId) {
+        TODO()
+    }
+
+    //TODO new,set,update will use this
+    private fun setPropertiesAndLinks(transaction: StoreTransaction, entity: Entity, commandArguments: CommandArguments) {
+        commandArguments.properties.forEach { property ->
+            when (property.value.tokenType) {
+                TokenType.NUMBER -> {
+                    if (property.value.tokenContent.contains('.')) {
+                        entity.setProperty(property.key, property.value.tokenContent.toDouble())
+                    } else {
+                        entity.setProperty(property.key, property.value.tokenContent.toLong())
+                    }
+                }
+                TokenType.STRING -> {
+                    entity.setProperty(property.key, property.value.tokenContent)
+                }
+                else -> {
+                    throw RuntimeException("Property type must be string or number")
+                }
+            }
+        }
+        commandArguments.link.forEach {
+            val linkedEntity = transaction.getEntity(transaction.toEntityId(it.value.tokenContent))
+            entity.setLink(it.key, linkedEntity)
+        }
+        commandArguments.links.forEach {
+            val linkedEntity = transaction.getEntity(transaction.toEntityId(it.value.tokenContent))
+            entity.addLink(it.key, linkedEntity)
+        }
+    }
+
+    fun runNew(commandString: String): EntityId? {
+        val itr: Iterator<StrollToken> = tokenize(commandString)
+        val new = itr.next()
+        assert(new.tokenType == TokenType.KEYWORD && new.tokenContent == "new")
+        val entityType: String = itr.next().tokenContent
+
+        val commandArguments = readCommandArguments(itr) ?: throw RuntimeException()
 
         return entityStore.computeInTransaction { transaction ->
             val entity = transaction.newEntity(entityType)
-            commandArguments.properties.forEach { property ->
-                when (property.value.tokenType) {
-                    TokenType.NUMBER -> {
-                        if (property.value.tokenContent.contains('.')) {
-                            entity.setProperty(property.key, property.value.tokenContent.toDouble())
-                        } else {
-                            entity.setProperty(property.key, property.value.tokenContent.toLong())
-                        }
-                    }
-                    TokenType.STRING -> {
-                        entity.setProperty(property.key, property.value.tokenContent)
-                    }
-                    else -> {
-                        throw RuntimeException("Property type must be string or number")
-                    }
-                }
-            }
-            commandArguments.link.forEach {
-                val linkedEntity = transaction.getEntity(transaction.toEntityId(it.value.tokenContent))
-                entity.setLink(it.key, linkedEntity)
-            }
-            commandArguments.links.forEach {
-                val linkedEntity = transaction.getEntity(transaction.toEntityId(it.value.tokenContent))
-                entity.addLink(it.key, linkedEntity)
-            }
+            setPropertiesAndLinks(transaction, entity, commandArguments)
             entity.id
         }
     }
