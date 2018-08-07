@@ -94,12 +94,15 @@ class Stroll(private val entityStore: PersistentEntityStore) {
         return commandArguments
     }
 
-    //TODO call this when set is used
-    private fun clearPropertiesAndLinks(entityId: EntityId) {
-        TODO()
+    private fun clearPropertiesAndLinks(entity: Entity) {
+        entity.propertyNames.forEach {
+            entity.deleteProperty(it)
+        }
+        entity.linkNames.forEach {
+            entity.deleteLinks(it)
+        }
     }
 
-    //TODO new,set,update will use this
     private fun setPropertiesAndLinks(transaction: StoreTransaction, entity: Entity, commandArguments: CommandArguments) {
         commandArguments.properties.forEach { property ->
             when (property.value.tokenType) {
@@ -145,12 +148,31 @@ class Stroll(private val entityStore: PersistentEntityStore) {
 
     fun runUpdate(commandString: String) {
         val itr: Iterator<StrollToken> = tokenize(commandString)
-        TODO()
+        val new = itr.next()
+        assert(new.tokenType == TokenType.KEYWORD && new.tokenContent == "update")
+        val entityId: String = itr.next().tokenContent
+
+        val commandArguments = readCommandArguments(itr) ?: throw RuntimeException()
+
+        entityStore.executeInTransaction { transaction ->
+            val entity = transaction.getEntity(transaction.toEntityId(entityId))
+            setPropertiesAndLinks(transaction, entity, commandArguments)
+        }
     }
 
     fun runSet(commandString: String) {
         val itr: Iterator<StrollToken> = tokenize(commandString)
-        TODO()
+        val new = itr.next()
+        assert(new.tokenType == TokenType.KEYWORD && new.tokenContent == "update")
+        val entityId: String = itr.next().tokenContent
+
+        val commandArguments = readCommandArguments(itr) ?: throw RuntimeException()
+
+        entityStore.executeInTransaction { transaction ->
+            val entity = transaction.getEntity(transaction.toEntityId(entityId))
+            clearPropertiesAndLinks(entity)
+            setPropertiesAndLinks(transaction, entity, commandArguments)
+        }
     }
 
     fun runFind(commandString: String): List<EntityId>? {
