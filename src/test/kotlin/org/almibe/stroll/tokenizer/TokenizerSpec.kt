@@ -89,32 +89,33 @@ class TokenizerSpec : StringSpec({
     }
 
     "punctuation test" {
-        val command = ":->=>,][{}"
+        val command = ":_->=>,][{}"
         val tokens = tokenizer.tokenize(command)
         tokens[0] shouldBe StrollToken(TokenType.COLON, ":")
-        tokens[1] shouldBe StrollToken(TokenType.ARROW, "->")
-        tokens[2] shouldBe StrollToken(TokenType.FAT_ARROW, "=>")
-        tokens[3] shouldBe StrollToken(TokenType.COMMA, ",")
-        tokens[4] shouldBe StrollToken(TokenType.END_BRACKET, "]")
-        tokens[5] shouldBe StrollToken(TokenType.START_BRACKET, "[")
-        tokens[6] shouldBe StrollToken(TokenType.START_BRACE, "{")
-        tokens[7] shouldBe StrollToken(TokenType.END_BRACE, "}")
-        tokens.size shouldBe 8
+        tokens[1] shouldBe StrollToken(TokenType.UNDERSCORE, "_")
+        tokens[2] shouldBe StrollToken(TokenType.ARROW, "->")
+        tokens[3] shouldBe StrollToken(TokenType.FAT_ARROW, "=>")
+        tokens[4] shouldBe StrollToken(TokenType.COMMA, ",")
+        tokens[5] shouldBe StrollToken(TokenType.END_BRACKET, "]")
+        tokens[6] shouldBe StrollToken(TokenType.START_BRACKET, "[")
+        tokens[7] shouldBe StrollToken(TokenType.START_BRACE, "{")
+        tokens[8] shouldBe StrollToken(TokenType.END_BRACE, "}")
+        tokens.size shouldBe 9
     }
 
     "punctuation with spaces test" {
-        val command = " : -> => , { ] } [ "
+        val command = " : -> => , _ { ] } [ "
         val tokens = tokenizer.tokenize(command)
         tokens[0] shouldBe StrollToken(TokenType.COLON, ":")
         tokens[1] shouldBe StrollToken(TokenType.ARROW, "->")
         tokens[2] shouldBe StrollToken(TokenType.FAT_ARROW, "=>")
         tokens[3] shouldBe StrollToken(TokenType.COMMA, ",")
-        tokens[4] shouldBe StrollToken(TokenType.START_BRACE, "{")
-        tokens[5] shouldBe StrollToken(TokenType.END_BRACKET, "]")
-        tokens[6] shouldBe StrollToken(TokenType.END_BRACE, "}")
-        tokens[7] shouldBe StrollToken(TokenType.START_BRACKET, "[")
-
-        tokens.size shouldBe 8
+        tokens[4] shouldBe StrollToken(TokenType.UNDERSCORE, "_")
+        tokens[5] shouldBe StrollToken(TokenType.START_BRACE, "{")
+        tokens[6] shouldBe StrollToken(TokenType.END_BRACKET, "]")
+        tokens[7] shouldBe StrollToken(TokenType.END_BRACE, "}")
+        tokens[8] shouldBe StrollToken(TokenType.START_BRACKET, "[")
+        tokens.size shouldBe 9
     }
 
     "colon assignment without spaces" {
