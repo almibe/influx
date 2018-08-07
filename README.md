@@ -25,6 +25,8 @@ Example commands:
 
 Notes:
 
+`45-76` is an example of an entity id
+
 `:` sets a property
 
 `->` calls `setLink` method in Xodus api
