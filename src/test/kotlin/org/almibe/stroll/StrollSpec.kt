@@ -32,36 +32,55 @@ class StrollSpec : StringSpec({
     "support new with no properties" {
         val command = "new User {}"
         val result = influx.runNew(command)!!
-        result.localId shouldBe  0L
+        result.localId shouldBe 0L
         result.typeId shouldBe 0
     }
 
     "support new with single property" {
         val command = "new User { age: 54 }"
         val result = influx.runNew(command)!!
-        result.localId shouldBe  1L
+        result.localId shouldBe 1L
         result.typeId shouldBe 0
     }
 
     "support new with multiple properties" {
         val command = "new User { name: \"Bob\", username: \"bob\", age: 54 }"
         val result = influx.runNew(command)!!
-        result.localId shouldBe  2L
+        result.localId shouldBe 2L
         result.typeId shouldBe 0
     }
 
     "support single link in new command" {
         val command = "new User { name: \"Margret\", contact -> 0-2 }"
         val result = influx.runNew(command)!!
-        result.localId shouldBe  3L
+        result.localId shouldBe 3L
         result.typeId shouldBe 0
     }
 
     "support multiple links in new command" {
         val command = "new User { name: \"Bill\", supervises => [ 0-3, 0-2 ] }"
         val result = influx.runNew(command)!!
-        result.localId shouldBe  4L
+        result.localId shouldBe 4L
         result.typeId shouldBe 0
+    }
+
+    "support six major types" {
+        val command = "new TypeTest { char: 'a', int: 3, long: 1009L, double: 3.14, string: \"Test\", boolean: true }"
+        val result = influx.runNew(command)!!
+        result.localId shouldBe 0L
+        result.typeId shouldBe 1
+        val txnResult = entityStore.computeInReadonlyTransaction { txn ->
+            txn.find("TypeTest", "char", 'a').size() +
+            txn.find("TypeTest", "int", 3).size() +
+            txn.find("TypeTest", "long", 1009L).size() +
+            txn.find("TypeTest", "double", 3.14).size() +
+            txn.find("TypeTest", "string", "Test").size() +
+            txn.find("TypeTest", "boolean", true).size() +
+            //below should return 0
+            txn.find("TypeTest", "boolean", "true").size() +
+            txn.find("TypeTest", "double", 3.14f).size()
+        }
+        txnResult shouldBe 6
     }
 
     "add age and extra user link" {
@@ -74,6 +93,23 @@ class StrollSpec : StringSpec({
         influx.runSet(command)
     }
 
+    "delete single entity" {
+        influx.runNew("new DeleteTest { }")
+        val command = "delete 2-0"
+        influx.runDelete(command)
+    }
+    "delete list of entities" {
+        influx.runNew("new DeleteTest { test: 345}")
+        influx.runNew("new DeleteTest { blah: \"Stuff\"}")
+        val command = "delete [2-1, 2-2]"
+        influx.runDelete(command)
+    }
+
+    "test that all DeleteTest entites have been deleted" {
+        val command = "find DeleteTest {}"
+        val result = influx.runFind(command)!!
+        result.size shouldBe 0
+    }
     "test finding all Users" {
         val command = "find User {}"
         val result = influx.runFind(command)!!
@@ -99,17 +135,17 @@ class StrollSpec : StringSpec({
         result2.size shouldBe 1
     }
 
-    "delete single entity" {
-        val command = "delete 0-1"
-        influx.runDelete(command)
-    }
-    "delete list of entities" {
-        val command = "delete [0-2, 0-3]"
-        influx.runDelete(command)
-    }
-    "check number of Users after delete calls" {
-        val command = "find User {}"
+    "test finding Users with property and link exists queries" {
+        val command = "find User { supervises => _ }"
         val result = influx.runFind(command)!!
-        result.size shouldBe 2
+        result.size shouldBe 1
+
+        val command1 = "find User { supervises -> _ }"
+        val result1 = influx.runFind(command1)!!
+        result1.size shouldBe 1
+
+        val command2 = "find User { username: _ }"
+        val result2 = influx.runFind(command2)!!
+        result2.size shouldBe 1
     }
 })
