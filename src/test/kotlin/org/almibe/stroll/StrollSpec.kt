@@ -51,26 +51,26 @@ class StrollSpec : StringSpec({
     }
 
     "support single link in new command" {
-        val command = "new User { name: \"Margret\", contact -> User#2 }"
+        val command = "new User { name: \"Margret\", contact -> 0-2 }"
         val result = influx.runNew(command)!!
         result.localId shouldBe  3L
         result.typeId shouldBe 0
     }
 
     "support multiple links in new command" {
-        val command = "new User { name: \"Bill\", supervises => [ User#3, User#2 ] }"
+        val command = "new User { name: \"Bill\", supervises => [ 0-3, 0-2 ] }"
         val result = influx.runNew(command)!!
         result.localId shouldBe  4L
         result.typeId shouldBe 0
     }
 
     "add age and extra user link" {
-        val command = "update User#4 { age: 45, supervises => [ User#1 ], supervises => User#0 }"
+        val command = "update 0-4 { age: 45, supervises => [ 0-1 ], supervises => 0-0 }"
         influx.runUpdate(command)
     }
 
-    "replace data for User#1" {
-        val command = "update User#1 { age:24, name: \"Lil\" }"
+    "replace data for 0-1" {
+        val command = "update 0-1 { age:24, name: \"Lil\" }"
         influx.runSet(command)
     }
 
@@ -90,21 +90,21 @@ class StrollSpec : StringSpec({
     }
 
     "test finding User based on links" {
-        val command = "find User { supervises => [ User#1, User#3 ] }"
+        val command = "find User { supervises => [ 0-1, 0-3 ] }"
         val result = influx.runFind(command)!!
         result.size shouldBe 1
 
-        val command2 = "find User { contact -> User#2, name: \"Margret\" }"
+        val command2 = "find User { contact -> 0-2, name: \"Margret\" }"
         val result2 = influx.runFind(command2)!!
         result2.size shouldBe 1
     }
 
     "delete single entity" {
-        val command = "delete User#1"
+        val command = "delete 0-1"
         influx.runDelete(command)
     }
     "delete list of entities" {
-        val command = "delete [User#2, User#3]"
+        val command = "delete [0-2, 0-3]"
         influx.runDelete(command)
     }
     "check number of Users after delete calls" {
