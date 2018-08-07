@@ -108,7 +108,7 @@ class Stroll(private val entityStore: PersistentEntityStore) {
         TODO()
     }
 
-    fun handleDelete(commandString: String) {
+    fun runDelete(commandString: String) {
         val itr: Iterator<StrollToken> = tokenize(commandString)
         TODO()
     }
