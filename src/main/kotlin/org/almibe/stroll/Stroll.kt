@@ -19,9 +19,10 @@ under the License.
 
 package org.almibe.stroll
 
-import jetbrains.exodus.entitystore.EntityId
+import jetbrains.exodus.entitystore.Entity
 import jetbrains.exodus.entitystore.EntityIterable
 import jetbrains.exodus.entitystore.PersistentEntityStore
+import jetbrains.exodus.entitystore.StoreTransaction
 import org.almibe.stroll.tokenizer.StrollToken
 import org.almibe.stroll.tokenizer.TokenType
 import org.almibe.stroll.tokenizer.Tokenizer
@@ -31,7 +32,7 @@ class Stroll(private val entityStore: PersistentEntityStore) {
 
     private fun tokenize(command: String): Iterator<StrollToken> = tokenizer.tokenize(command).iterator()
 
-    fun runNew(commandString: String): EntityId? {
+    fun runNew(commandString: String, transation: StoreTransaction): Entity? {
         val itr: Iterator<StrollToken> = tokenize(commandString)
         //new User {}
         //new User { username: "Josh"}
@@ -71,27 +72,40 @@ class Stroll(private val entityStore: PersistentEntityStore) {
             }
         }
 
-        return entityStore.computeInTransaction { trans ->
-            val entity = trans.newEntity(newCommand.entityType)
-            newCommand.properties.forEach {
-                when (it.value.tokenType) {
-                    TokenType.NUMBER -> {}
-                    TokenType.STRING -> {}
-                    else -> {
-                        trans.abort()
-                    }
+
+        val entity = transation.newEntity(newCommand.entityType)
+        newCommand.properties.forEach {
+            when (it.value.tokenType) {
+                TokenType.NUMBER -> {
+                    TODO()
+                }
+                TokenType.STRING -> {
+                    TODO()
+                }
+                else -> {
+                    transation.abort()
                 }
             }
-            entity.id
         }
+        return entity
     }
 
-    fun runFind(commandString: String): EntityIterable? {
+    fun runFind(commandString: String, transation: StoreTransaction): EntityIterable? {
         val itr: Iterator<StrollToken> = tokenize(commandString)
         TODO()
     }
 
-    fun handleDelete(commandString: String): EntityIterable? {
+    fun runUpdate(commandString: String, transation: StoreTransaction) {
+        val itr: Iterator<StrollToken> = tokenize(commandString)
+        TODO()
+    }
+
+    fun runSet(commandString: String, transation: StoreTransaction) {
+        val itr: Iterator<StrollToken> = tokenize(commandString)
+        TODO()
+    }
+
+    fun handleDelete(commandString: String, transation: StoreTransaction) {
         val itr: Iterator<StrollToken> = tokenize(commandString)
         TODO()
     }

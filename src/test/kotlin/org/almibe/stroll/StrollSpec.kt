@@ -19,6 +19,7 @@ under the License.
 
 package org.almibe.stroll
 
+import io.kotlintest.shouldBe
 import io.kotlintest.specs.StringSpec
 import jetbrains.exodus.entitystore.PersistentEntityStore
 import jetbrains.exodus.entitystore.PersistentEntityStores
@@ -30,14 +31,14 @@ class StrollSpec : StringSpec({
 
     "support new with no properties" {
         val command = "new User {}"
-        val result = influx.run(command)!!.first!!
+        val result = influx.runNew(command)!!
         result.type shouldBe "User"
-        result.propertyNames.size shouldBe 0
+        result.toIdString() shouldBe "0-0"
     }
 
     "support new with single property" {
         val command = "new User { age: 54 }"
-        val result = influx.run(command)!!.first!!
+        val result = influx.runNew(command)!!
         result.type shouldBe "User"
         result.getProperty("age") shouldBe 54
         result.propertyNames.size shouldBe 1
@@ -45,7 +46,7 @@ class StrollSpec : StringSpec({
 
     "support new with multiple properties" {
         val command = "new User { name: \"Bob\", username: \"bob\", age: 54 }"
-        val result = influx.run(command)!!.first!!
+        val result = influx.runNew(command)!!
         result.type shouldBe "User"
         result.getProperty("age") shouldBe 54
         result.getProperty("name") shouldBe "Bob"
