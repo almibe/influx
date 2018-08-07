@@ -25,6 +25,12 @@ import org.almibe.stroll.tokenizer.StrollToken
 import org.almibe.stroll.tokenizer.TokenType
 import org.almibe.stroll.tokenizer.Tokenizer
 
+data class CommandArguments (
+        val properties: MutableMap<String, StrollToken> = mutableMapOf(),
+        val link: MutableMap<String, StrollToken> = mutableMapOf(),
+        val links: MutableMap<String, StrollToken> = mutableMapOf()
+)
+
 class Stroll(private val entityStore: PersistentEntityStore) {
     private val tokenizer = Tokenizer()
 
@@ -38,7 +44,7 @@ class Stroll(private val entityStore: PersistentEntityStore) {
         val new = itr.next()
         assert(new.tokenType == TokenType.KEYWORD && new.tokenContent == "new")
         val entityType: String = itr.next().tokenContent
-        val newCommand = NewCommand(entityType)
+        val commandArguments = CommandArguments()
 
         val brace = itr.next()
         assert(brace.tokenType == TokenType.START_BRACE)
@@ -59,11 +65,11 @@ class Stroll(private val entityStore: PersistentEntityStore) {
 
                     if (colonOrLink.tokenType == TokenType.COLON &&
                             (value.tokenType == TokenType.NUMBER || value.tokenType == TokenType.STRING)) {
-                        newCommand.properties[propertyName] = value
+                        commandArguments.properties[propertyName] = value
                     } else if (colonOrLink.tokenType == TokenType.ARROW && value.tokenType == TokenType.IDENTITY) {
-                        newCommand.link[propertyName] = value
+                        commandArguments.link[propertyName] = value
                     } else if (colonOrLink.tokenType == TokenType.FAT_ARROW && value.tokenType == TokenType.IDENTITY) {
-                        newCommand.links[propertyName] = value
+                        commandArguments.links[propertyName] = value
                     } else if (colonOrLink.tokenType == TokenType.FAT_ARROW && value.tokenType == TokenType.START_BRACKET) {
                         while (true) {
                             val identity = itr.next()
@@ -71,7 +77,7 @@ class Stroll(private val entityStore: PersistentEntityStore) {
                             assert(identity.tokenType == TokenType.IDENTITY)
                             assert(commaOrEndBracket.tokenType == TokenType.COMMA ||
                                    commaOrEndBracket.tokenType == TokenType.END_BRACKET)
-                            newCommand.links[propertyName] = identity
+                            commandArguments.links[propertyName] = identity
                             if (commaOrEndBracket.tokenType == TokenType.COMMA) {
                                 continue
                             } else {
@@ -92,8 +98,8 @@ class Stroll(private val entityStore: PersistentEntityStore) {
         }
 
         return entityStore.computeInTransaction { transaction ->
-            val entity = transaction.newEntity(newCommand.entityType)
-            newCommand.properties.forEach { property ->
+            val entity = transaction.newEntity(entityType)
+            commandArguments.properties.forEach { property ->
                 when (property.value.tokenType) {
                     TokenType.NUMBER -> {
                         if (property.value.tokenContent.contains('.')) {
@@ -110,12 +116,11 @@ class Stroll(private val entityStore: PersistentEntityStore) {
                     }
                 }
             }
-            newCommand.link.forEach {
+            commandArguments.link.forEach {
                 val linkedEntity = transaction.getEntity(transaction.toEntityId(it.value.tokenContent))
                 entity.setLink(it.key, linkedEntity)
             }
-            newCommand.links.forEach {
-                println("****" + it.value.tokenContent)
+            commandArguments.links.forEach {
                 val linkedEntity = transaction.getEntity(transaction.toEntityId(it.value.tokenContent))
                 entity.addLink(it.key, linkedEntity)
             }
