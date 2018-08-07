@@ -46,6 +46,13 @@ class TokenizerSpec : StringSpec({
         tokens.size shouldBe 1
     }
 
+    "char test" {
+        val command = "'s'"
+        val tokens = tokenizer.tokenize(command)
+        tokens[0] shouldBe StrollToken(TokenType.CHAR, "s")
+        tokens.size shouldBe 1
+    }
+
     "int test" {
         val command = "6"
         val tokens = tokenizer.tokenize(command)

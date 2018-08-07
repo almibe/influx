@@ -45,6 +45,7 @@ class Tokenizer {
             in 'a'..'z' -> checkKeyword(currentChar, itr, tokens)
             in 'A'..'Z' -> checkKeyword(currentChar, itr, tokens)
             '"' -> checkString(itr, tokens)
+            '\'' -> checkChar(itr, tokens)
             in '0'..'9' -> checkNumberOrIdentity(currentChar, itr, tokens)
             '-', '=' -> checkArrow(currentChar, itr, tokens)
         }
@@ -88,7 +89,7 @@ class Tokenizer {
             if (currentChar == '"') {
                 break
             } else if(currentChar == '\\') {
-                //TODO handle escape char
+                TODO("handle escape char")
             } else {
                 keyword.append(currentChar)
             }
@@ -101,6 +102,16 @@ class Tokenizer {
         } else {
             throw RuntimeException("String not closed.")
         }
+    }
+
+    private fun checkChar(itr: Iterator<Char>, tokens: MutableList<StrollToken>) {
+        val currentChar = itr.next()
+        if (currentChar == '\\') {
+            TODO("handle escape char")
+        }
+        val closingSingleQuote = itr.next()
+        assert(closingSingleQuote == '\'')
+        tokens.add(StrollToken(TokenType.CHAR, currentChar.toString()))
     }
 
     private fun checkNumberOrIdentity(firstChar: Char, itr: Iterator<Char>, tokens: MutableList<StrollToken>) {

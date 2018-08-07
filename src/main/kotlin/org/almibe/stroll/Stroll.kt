@@ -80,7 +80,7 @@ class Stroll(private val entityStore: PersistentEntityStore) {
                             }
                         }
                     } else {
-                        throw RuntimeException("Unexpected value types ${colonOrLink.tokenType} & ${value.tokenType}")
+                        throw RuntimeException("Unexpected value types $colonOrLink & $value")
                     }
                     val braceOrComma = itr.next()
                     assert(braceOrComma.tokenType == TokenType.COMMA ||
