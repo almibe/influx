@@ -33,6 +33,22 @@ Notes:
 
 `=>` calls `addLink` method in Xodus api
 
+`_` means this property or link has been set when used in a find `username: _` `spouse -> _`
+
+`to` is used to search for a range `age: 5 to 50`
+
+`startsWith` is used to search for a string that starts with a value `username: startsWith "bob"`
+
 `update` replaces or adds properties & links
 
 `set` removes all existing properties and links and adds the newly provided ones
+
+All floating point numbers are double
+
+All fixed point numbers all ints unless they have an L after them then they are Longs
+
+Chars are in single quotes and strings are in double quotes
+
+Booleans are represented with the keyword true or false
+
+Stroll does not support nulls

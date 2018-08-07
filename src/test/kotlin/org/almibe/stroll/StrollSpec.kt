@@ -148,4 +148,14 @@ class StrollSpec : StringSpec({
         val result2 = influx.runFind(command2)!!
         result2.size shouldBe 1
     }
+
+    "test using startsWith" {
+        val command = "find User { name: startsWith \"Ma\" }"
+        val result = influx.runFind(command)!!
+        result.size shouldBe 1
+
+        val command1 = "find User { name: startsWith \"B\" }"
+        val result1 = influx.runFind(command1)!!
+        result1.size shouldBe 2
+    }
 })
