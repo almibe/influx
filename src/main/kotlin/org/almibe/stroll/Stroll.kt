@@ -64,8 +64,22 @@ class Stroll(private val entityStore: PersistentEntityStore) {
                         newCommand.link[propertyName] = value
                     } else if (colonOrLink.tokenType == TokenType.FAT_ARROW && value.tokenType == TokenType.IDENTITY) {
                         newCommand.links[propertyName] = value
+                    } else if (colonOrLink.tokenType == TokenType.FAT_ARROW && value.tokenType == TokenType.START_BRACKET) {
+                        while (true) {
+                            val identity = itr.next()
+                            val commaOrEndBracket = itr.next()
+                            assert(identity.tokenType == TokenType.IDENTITY)
+                            assert(commaOrEndBracket.tokenType == TokenType.COMMA ||
+                                   commaOrEndBracket.tokenType == TokenType.END_BRACKET)
+                            newCommand.links[propertyName] = identity
+                            if (commaOrEndBracket.tokenType == TokenType.COMMA) {
+                                continue
+                            } else {
+                                break
+                            }
+                        }
                     } else {
-                        throw RuntimeException("Unexpected value type")
+                        throw RuntimeException("Unexpected value types ${colonOrLink.tokenType} & ${value.tokenType}")
                     }
                     val braceOrComma = itr.next()
                     assert(braceOrComma.tokenType == TokenType.COMMA ||
@@ -97,18 +111,16 @@ class Stroll(private val entityStore: PersistentEntityStore) {
                 }
             }
             newCommand.link.forEach {
-                TODO()
+                val linkedEntity = transaction.getEntity(transaction.toEntityId(it.value.tokenContent))
+                entity.setLink(it.key, linkedEntity)
             }
             newCommand.links.forEach {
-                TODO()
+                println("****" + it.value.tokenContent)
+                val linkedEntity = transaction.getEntity(transaction.toEntityId(it.value.tokenContent))
+                entity.addLink(it.key, linkedEntity)
             }
             entity.id
         }
-    }
-
-    fun runFind(commandString: String): List<EntityId>? {
-        val itr: Iterator<StrollToken> = tokenize(commandString)
-        TODO()
     }
 
     fun runUpdate(commandString: String) {
@@ -117,6 +129,11 @@ class Stroll(private val entityStore: PersistentEntityStore) {
     }
 
     fun runSet(commandString: String) {
+        val itr: Iterator<StrollToken> = tokenize(commandString)
+        TODO()
+    }
+
+    fun runFind(commandString: String): List<EntityId>? {
         val itr: Iterator<StrollToken> = tokenize(commandString)
         TODO()
     }
