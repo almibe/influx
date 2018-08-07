@@ -11,25 +11,25 @@ Example commands:
 
 `new User { name: "Alex", hp: 42, employer => Employer#3 }`
 
-`new Character { name: "Billy Lee", games => [ Game#34, Game#344, Game#324,Game#134 ], rightsHolder -> Company#404 }`
+`new Character { name: "Billy Lee", games => [ 0-34, 0-344, 0-324,0-134 ], rightsHolder -> 2-404 }`
 
-`delete Character#55`
+`delete 1-55`
 
-`delete [Character#55, Character#556]`
+`delete [1-55, 1-556]`
 
-`find Character { games => Game#45 }`
+`find Character { games => 0-45 }`
 
-`update Character#44 { name: "Chuck Rock" }`
+`update 1-44 { name: "Chuck Rock" }`
 
-`set Character#45 { name: "Bobert" }`
+`set 1-45 { name: "Bobert" }`
 
 Notes:
 
 `:` sets a property
 
-`->` calls `link` methods in Xodus api
+`->` calls `setLink` method in Xodus api
 
-`=>` calls `links` methods in Xodus api
+`=>` calls `addLink` method in Xodus api
 
 `update` replaces or adds properties & links
 
