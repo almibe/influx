@@ -19,10 +19,8 @@ under the License.
 
 package org.almibe.stroll
 
-import jetbrains.exodus.entitystore.Entity
-import jetbrains.exodus.entitystore.EntityIterable
+import jetbrains.exodus.entitystore.EntityId
 import jetbrains.exodus.entitystore.PersistentEntityStore
-import jetbrains.exodus.entitystore.StoreTransaction
 import org.almibe.stroll.tokenizer.StrollToken
 import org.almibe.stroll.tokenizer.TokenType
 import org.almibe.stroll.tokenizer.Tokenizer
@@ -32,7 +30,7 @@ class Stroll(private val entityStore: PersistentEntityStore) {
 
     private fun tokenize(command: String): Iterator<StrollToken> = tokenizer.tokenize(command).iterator()
 
-    fun runNew(commandString: String, transation: StoreTransaction): Entity? {
+    fun runNew(commandString: String): EntityId? {
         val itr: Iterator<StrollToken> = tokenize(commandString)
         //new User {}
         //new User { username: "Josh"}
@@ -72,40 +70,45 @@ class Stroll(private val entityStore: PersistentEntityStore) {
             }
         }
 
-
-        val entity = transation.newEntity(newCommand.entityType)
-        newCommand.properties.forEach {
-            when (it.value.tokenType) {
-                TokenType.NUMBER -> {
-                    TODO()
-                }
-                TokenType.STRING -> {
-                    TODO()
-                }
-                else -> {
-                    transation.abort()
+        return entityStore.computeInTransaction { transaction ->
+            val entity = transaction.newEntity(newCommand.entityType)
+            newCommand.properties.forEach { property ->
+                when (property.value.tokenType) {
+                    TokenType.NUMBER -> {
+                        if (property.value.tokenContent.contains('.')) {
+                            entity.setProperty(property.key, property.value.tokenContent.toDouble())
+                        } else {
+                            entity.setProperty(property.key, property.value.tokenContent.toLong())
+                        }
+                    }
+                    TokenType.STRING -> {
+                        entity.setProperty(property.key, property.value.tokenContent)
+                    }
+                    else -> {
+                        throw RuntimeException("Property type must be string or number")
+                    }
                 }
             }
+            entity.id
         }
-        return entity
     }
 
-    fun runFind(commandString: String, transation: StoreTransaction): EntityIterable? {
+    fun runFind(commandString: String): List<EntityId>? {
         val itr: Iterator<StrollToken> = tokenize(commandString)
         TODO()
     }
 
-    fun runUpdate(commandString: String, transation: StoreTransaction) {
+    fun runUpdate(commandString: String) {
         val itr: Iterator<StrollToken> = tokenize(commandString)
         TODO()
     }
 
-    fun runSet(commandString: String, transation: StoreTransaction) {
+    fun runSet(commandString: String) {
         val itr: Iterator<StrollToken> = tokenize(commandString)
         TODO()
     }
 
-    fun handleDelete(commandString: String, transation: StoreTransaction) {
+    fun handleDelete(commandString: String) {
         val itr: Iterator<StrollToken> = tokenize(commandString)
         TODO()
     }

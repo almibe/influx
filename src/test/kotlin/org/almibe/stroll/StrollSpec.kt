@@ -32,25 +32,21 @@ class StrollSpec : StringSpec({
     "support new with no properties" {
         val command = "new User {}"
         val result = influx.runNew(command)!!
-        result.type shouldBe "User"
-        result.toIdString() shouldBe "0-0"
+        result.localId shouldBe  0L
+        result.typeId shouldBe 0
     }
 
     "support new with single property" {
         val command = "new User { age: 54 }"
         val result = influx.runNew(command)!!
-        result.type shouldBe "User"
-        result.getProperty("age") shouldBe 54
-        result.propertyNames.size shouldBe 1
+        result.localId shouldBe  1L
+        result.typeId shouldBe 0
     }
 
     "support new with multiple properties" {
         val command = "new User { name: \"Bob\", username: \"bob\", age: 54 }"
         val result = influx.runNew(command)!!
-        result.type shouldBe "User"
-        result.getProperty("age") shouldBe 54
-        result.getProperty("name") shouldBe "Bob"
-        result.getProperty("username") shouldBe "bob"
-        result.propertyNames.size shouldBe 3
+        result.localId shouldBe  2L
+        result.typeId shouldBe 0
     }
 })
