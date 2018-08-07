@@ -19,6 +19,7 @@ under the License.
 
 package org.almibe.stroll
 
+import jetbrains.exodus.entitystore.Entity
 import jetbrains.exodus.entitystore.EntityId
 import jetbrains.exodus.entitystore.PersistentEntityStore
 import org.almibe.stroll.tokenizer.StrollToken
@@ -35,6 +36,21 @@ class Stroll(private val entityStore: PersistentEntityStore) {
     private val tokenizer = Tokenizer()
 
     private fun tokenize(command: String): Iterator<StrollToken> = tokenizer.tokenize(command).iterator()
+
+    //new,set,update,find will all use this
+    private fun readCommandArguments(itr: Iterator<StrollToken>): CommandArguments {
+        TODO()
+    }
+
+    //call this when set is used
+    private fun clearPropertiesAndLinks(entityId: EntityId) {
+        TODO()
+    }
+
+    //new,set,update will use this
+    private fun setPropertiesAndLinks(entity: Entity, commandArguments: CommandArguments) {
+        TODO()
+    }
 
     fun runNew(commandString: String): EntityId? {
         val itr: Iterator<StrollToken> = tokenize(commandString)
