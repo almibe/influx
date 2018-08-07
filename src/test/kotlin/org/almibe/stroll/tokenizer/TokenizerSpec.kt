@@ -151,12 +151,12 @@ class TokenizerSpec : StringSpec({
     }
 
     "fat arrow assignment with spaces" {
-        val command = "  { company => Company#42  }    "
+        val command = "  { company => 3-42  }    "
         val tokens = tokenizer.tokenize(command)
         tokens[0] shouldBe StrollToken(TokenType.START_BRACE, "{")
         tokens[1] shouldBe StrollToken(TokenType.KEYWORD, "company")
         tokens[2] shouldBe StrollToken(TokenType.FAT_ARROW, "=>")
-        tokens[3] shouldBe StrollToken(TokenType.IDENTITY, "Company#42")
+        tokens[3] shouldBe StrollToken(TokenType.IDENTITY, "3-42")
         tokens[4] shouldBe StrollToken(TokenType.END_BRACE, "}")
         tokens.size shouldBe 5
     }
@@ -179,31 +179,31 @@ class TokenizerSpec : StringSpec({
     }
 
     "identity test" {
-        val command = "User#76"
+        val command = "0-76"
         val tokens = tokenizer.tokenize(command)
-        tokens[0] shouldBe StrollToken(TokenType.IDENTITY, "User#76")
+        tokens[0] shouldBe StrollToken(TokenType.IDENTITY, "0-76")
         tokens.size shouldBe 1
     }
 
     "arrow to identity test" {
-        val command = "user->User#76"
+        val command = "user->0-76"
         val tokens = tokenizer.tokenize(command)
         tokens[0] shouldBe StrollToken(TokenType.KEYWORD, "user")
         tokens[1] shouldBe StrollToken(TokenType.ARROW, "->")
-        tokens[2] shouldBe StrollToken(TokenType.IDENTITY, "User#76")
+        tokens[2] shouldBe StrollToken(TokenType.IDENTITY, "0-76")
         tokens.size shouldBe 3
     }
 
     "fat arrow to identity test" {
-        val command = "  {  links => [User#76, User#45]}"
+        val command = "  {  links => [0-76, 45-45]}"
         val tokens = tokenizer.tokenize(command)
         tokens[0] shouldBe StrollToken(TokenType.START_BRACE, "{")
         tokens[1] shouldBe StrollToken(TokenType.KEYWORD, "links")
         tokens[2] shouldBe StrollToken(TokenType.FAT_ARROW, "=>")
         tokens[3] shouldBe StrollToken(TokenType.START_BRACKET, "[")
-        tokens[4] shouldBe StrollToken(TokenType.IDENTITY, "User#76")
+        tokens[4] shouldBe StrollToken(TokenType.IDENTITY, "0-76")
         tokens[5] shouldBe StrollToken(TokenType.COMMA, ",")
-        tokens[6] shouldBe StrollToken(TokenType.IDENTITY, "User#45")
+        tokens[6] shouldBe StrollToken(TokenType.IDENTITY, "45-45")
         tokens[7] shouldBe StrollToken(TokenType.END_BRACKET, "]")
         tokens[8] shouldBe StrollToken(TokenType.END_BRACE, "}")
         tokens.size shouldBe 9

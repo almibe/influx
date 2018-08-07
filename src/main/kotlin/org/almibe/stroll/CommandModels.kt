@@ -23,5 +23,7 @@ import org.almibe.stroll.tokenizer.StrollToken
 
 data class NewCommand (
     val entityType: String,
-    val properties: MutableMap<String, StrollToken> = mutableMapOf()
+    val properties: MutableMap<String, StrollToken> = mutableMapOf(),
+    val link: MutableMap<String, StrollToken> = mutableMapOf(),
+    val links: MutableMap<String, StrollToken> = mutableMapOf()
 )

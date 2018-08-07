@@ -54,12 +54,19 @@ class Stroll(private val entityStore: PersistentEntityStore) {
                 }
                 TokenType.KEYWORD -> {
                     val propertyName = next.tokenContent
-                    val colon = itr.next()
+                    val colonOrLink = itr.next()
                     val value = itr.next()
-                    assert(colon.tokenType == TokenType.COLON)
-                    assert(value.tokenType == TokenType.NUMBER ||
-                            value.tokenType == TokenType.STRING)
-                    newCommand.properties.put(propertyName, value)
+
+                    if (colonOrLink.tokenType == TokenType.COLON &&
+                            (value.tokenType == TokenType.NUMBER || value.tokenType == TokenType.STRING)) {
+                        newCommand.properties[propertyName] = value
+                    } else if (colonOrLink.tokenType == TokenType.ARROW && value.tokenType == TokenType.IDENTITY) {
+                        newCommand.link[propertyName] = value
+                    } else if (colonOrLink.tokenType == TokenType.FAT_ARROW && value.tokenType == TokenType.IDENTITY) {
+                        newCommand.links[propertyName] = value
+                    } else {
+                        throw RuntimeException("Unexpected value type")
+                    }
                     val braceOrComma = itr.next()
                     assert(braceOrComma.tokenType == TokenType.COMMA ||
                            braceOrComma.tokenType == TokenType.END_BRACE)
@@ -88,6 +95,12 @@ class Stroll(private val entityStore: PersistentEntityStore) {
                         throw RuntimeException("Property type must be string or number")
                     }
                 }
+            }
+            newCommand.link.forEach {
+                TODO()
+            }
+            newCommand.links.forEach {
+                TODO()
             }
             entity.id
         }

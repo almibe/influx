@@ -44,7 +44,7 @@ class Tokenizer {
             in 'a'..'z' -> checkKeyword(currentChar, itr, tokens)
             in 'A'..'Z' -> checkKeyword(currentChar, itr, tokens)
             '"' -> checkString(itr, tokens)
-            in '0'..'9' -> checkNumber(currentChar, itr, tokens)
+            in '0'..'9' -> checkNumberOrIdentity(currentChar, itr, tokens)
             '-', '=' -> checkArrow(currentChar, itr, tokens)
         }
         if (itr.hasNext()) {
@@ -59,7 +59,7 @@ class Tokenizer {
             return
         }
         var currentChar: Char? = itr.next()
-        while (currentChar in 'a'..'z' || currentChar in 'A'..'Z' || currentChar in '0'..'9' || currentChar == '#') {
+        while (currentChar in 'a'..'z' || currentChar in 'A'..'Z' || currentChar in '0'..'9') {
             keyword.append(currentChar)
             if (itr.hasNext()) {
                 currentChar = itr.next()
@@ -71,7 +71,6 @@ class Tokenizer {
 
         when {
             keyword.matches(Regex("[a-zA-Z0-9]+")) -> tokens.add(StrollToken(TokenType.KEYWORD, keyword.toString()))
-            keyword.matches(Regex("[a-zA-Z0-9]+#[0-9]+")) -> tokens.add(StrollToken(TokenType.IDENTITY, keyword.toString()))
             else -> throw RuntimeException("Keyword or Identity incorrectly formed $keyword.")
         }
 
@@ -103,26 +102,32 @@ class Tokenizer {
         }
     }
 
-    private fun checkNumber(firstChar: Char, itr: Iterator<Char>, tokens: MutableList<StrollToken>) {
+    private fun checkNumberOrIdentity(firstChar: Char, itr: Iterator<Char>, tokens: MutableList<StrollToken>) {
         val number = StringBuilder(firstChar.toString())
 
         if (!itr.hasNext()) {
             tokens.add(StrollToken(TokenType.NUMBER, number.toString()))
-        } else {
-            var currentChar = itr.next()
-            while (currentChar in '0'..'9' || currentChar == '.') {
-                number.append(currentChar)
-                if (itr.hasNext()) {
-                    currentChar = itr.next()
-                } else {
-                    break
-                }
+            return
+        }
+        var currentChar: Char? = itr.next()
+        while (currentChar in '0'..'9' || currentChar == '.' || currentChar == '-') {
+            number.append(currentChar)
+            if (itr.hasNext()) {
+                currentChar = itr.next()
+            } else {
+                currentChar = null
+                break
             }
-            when {
-                number.matches(Regex("[0-9]+")) -> tokens.add(StrollToken(TokenType.NUMBER, number.toString()))
-                number.matches(Regex("[0-9]+\\.[0-9]+")) -> tokens.add(StrollToken(TokenType.NUMBER, number.toString()))
-                else -> throw RuntimeException("Number incorrectly formed $number.")
-            }
+        }
+        when {
+            number.matches(Regex("[0-9]+")) -> tokens.add(StrollToken(TokenType.NUMBER, number.toString()))
+            number.matches(Regex("[0-9]+\\.[0-9]+")) -> tokens.add(StrollToken(TokenType.NUMBER, number.toString()))
+            number.matches(Regex("[0-9]+-[0-9]+")) -> tokens.add(StrollToken(TokenType.IDENTITY, number.toString()))
+            else -> throw RuntimeException("Number incorrectly formed $number.")
+        }
+
+        if (currentChar != null) {
+            startNextToken(currentChar, itr, tokens)
         }
     }
 
