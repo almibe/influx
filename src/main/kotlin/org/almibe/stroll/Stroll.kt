@@ -148,8 +148,8 @@ class Stroll(private val entityStore: PersistentEntityStore) {
 
     fun runUpdate(commandString: String) {
         val itr: Iterator<StrollToken> = tokenize(commandString)
-        val new = itr.next()
-        assert(new.tokenType == TokenType.KEYWORD && new.tokenContent == "update")
+        val update = itr.next()
+        assert(update.tokenType == TokenType.KEYWORD && update.tokenContent == "update")
         val entityId: String = itr.next().tokenContent
 
         val commandArguments = readCommandArguments(itr) ?: throw RuntimeException()
@@ -162,8 +162,8 @@ class Stroll(private val entityStore: PersistentEntityStore) {
 
     fun runSet(commandString: String) {
         val itr: Iterator<StrollToken> = tokenize(commandString)
-        val new = itr.next()
-        assert(new.tokenType == TokenType.KEYWORD && new.tokenContent == "update")
+        val set = itr.next()
+        assert(set.tokenType == TokenType.KEYWORD && set.tokenContent == "update")
         val entityId: String = itr.next().tokenContent
 
         val commandArguments = readCommandArguments(itr) ?: throw RuntimeException()
@@ -177,7 +177,13 @@ class Stroll(private val entityStore: PersistentEntityStore) {
 
     fun runFind(commandString: String): List<EntityId>? {
         val itr: Iterator<StrollToken> = tokenize(commandString)
-        TODO()
+        val find = itr.next()
+        assert(find.tokenType == TokenType.KEYWORD && find.tokenContent == "find")
+        val entityType: String = itr.next().tokenContent
+
+        val commandArguments = readCommandArguments(itr) ?: throw RuntimeException()
+
+        TODO("finish")
     }
 
     fun runDelete(commandString: String) {
