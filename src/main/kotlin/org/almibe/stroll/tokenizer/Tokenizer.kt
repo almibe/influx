@@ -40,6 +40,7 @@ class Tokenizer {
             '[' -> tokens.add(StrollToken(TokenType.START_BRACKET, "["))
             ']' -> tokens.add(StrollToken(TokenType.END_BRACKET, "]"))
             ',' -> tokens.add(StrollToken(TokenType.COMMA, ","))
+            '_' -> tokens.add(StrollToken(TokenType.UNDERSCORE, "_"))
             //multi character checks
             in 'a'..'z' -> checkKeyword(currentChar, itr, tokens)
             in 'A'..'Z' -> checkKeyword(currentChar, itr, tokens)

@@ -31,7 +31,8 @@ enum class TokenType {
     START_BRACKET,
     END_BRACKET,
     COMMA,
-    IDENTITY
+    IDENTITY,
+    UNDERSCORE
 }
 
 data class StrollToken(val tokenType: TokenType, val tokenContent: String)
