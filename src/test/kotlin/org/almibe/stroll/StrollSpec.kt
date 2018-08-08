@@ -149,6 +149,12 @@ class StrollSpec : StringSpec({
         result2.size shouldBe 1
     }
 
+    "test searching ranges with to" {
+        val command = "find User { age: 40 to 49 }"
+        val result = stroll.runFind(command)!!
+        result.size shouldBe 1
+    }
+
     "test using startsWith" {
         val command = "find User { name: startsWith \"Ma\" }"
         val result = stroll.runFind(command)!!
