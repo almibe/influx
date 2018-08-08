@@ -80,7 +80,7 @@ class StrollSpec : StringSpec({
             txn.find("TypeTest", "boolean", "true").size() +
             txn.find("TypeTest", "double", 3.14f).size()
         }
-        txnResult shouldBe 6
+        txnResult shouldBe 5
     }
 
     "add age and extra user link" {

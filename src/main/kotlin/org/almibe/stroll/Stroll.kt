@@ -116,10 +116,9 @@ class Stroll(private val entityStore: PersistentEntityStore) {
         commandArguments.properties.forEach { property ->
             when (property.value.tokenType) {
                 TokenType.DOUBLE -> entity.setProperty(property.key, property.value.tokenContent.toDouble())
-                TokenType.LONG -> entity.setProperty(property.key, property.value.tokenContent.toLong())
+                TokenType.LONG -> entity.setProperty(property.key, property.value.tokenContent.trim('L').toLong())
                 TokenType.INT -> entity.setProperty(property.key, property.value.tokenContent.toInt())
                 TokenType.STRING -> entity.setProperty(property.key, property.value.tokenContent)
-                //TokenType.CHAR -> entity.setProperty(property.key, property.value.tokenContent.first().toChar())
                 TokenType.KEYWORD -> entity.setProperty(property.key, property.value.tokenContent.toBoolean())
                 else -> {
                     throw RuntimeException("Property type must be string, char, boolean, int, long or double.")
