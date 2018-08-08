@@ -131,11 +131,11 @@ class StrollSpec : StringSpec({
         result.size shouldBe 1
     }
 
-//    "find User based on links" {
-//        val command = "find User { supervises => [ 0-1, 0-3 ] }"
-//        val result = stroll.runFind(command)
-//        result.size shouldBe 1
-//    }
+    "find User based on links" {
+        val command = "find User { supervises => [ 0-1, 0-3 ] }"
+        val result = stroll.runFind(command)
+        result.size shouldBe 1
+    }
 
     "find Users with property and link exists queries" {
         val command = "find User { supervises => _ }"

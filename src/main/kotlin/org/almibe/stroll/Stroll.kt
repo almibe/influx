@@ -28,7 +28,7 @@ data class CommandArguments (
         //three collections used by all commands
         val properties: MutableMap<String, StrollToken> = mutableMapOf(),
         val link: MutableMap<String, StrollToken> = mutableMapOf(),
-        val links: MutableMap<String, StrollToken> = mutableMapOf(),
+        val links: MutableList<Pair<String, StrollToken>> = mutableListOf(),
         //collections only used by find
         val propertyExistsCheck: MutableList<String> = mutableListOf(),
         val linkExistsCheck: MutableList<String> = mutableListOf()
@@ -78,7 +78,7 @@ class Stroll(private val entityStore: PersistentEntityStore) {
                     } else if (colonOrLink.tokenType == TokenType.ARROW && value.tokenType == TokenType.UNDERSCORE) {
                         commandArguments.linkExistsCheck.add(propertyName)
                     } else if (colonOrLink.tokenType == TokenType.FAT_ARROW && value.tokenType == TokenType.IDENTITY) {
-                        commandArguments.links[propertyName] = value
+                        commandArguments.links.add(Pair(propertyName, value))
                     } else if (colonOrLink.tokenType == TokenType.FAT_ARROW && value.tokenType == TokenType.UNDERSCORE) {
                         commandArguments.linkExistsCheck.add(propertyName)
                     } else if (colonOrLink.tokenType == TokenType.FAT_ARROW && value.tokenType == TokenType.START_BRACKET) {
@@ -88,7 +88,7 @@ class Stroll(private val entityStore: PersistentEntityStore) {
                             assert(identity.tokenType == TokenType.IDENTITY)
                             assert(commaOrEndBracket.tokenType == TokenType.COMMA ||
                                     commaOrEndBracket.tokenType == TokenType.END_BRACKET)
-                            commandArguments.links[propertyName] = identity
+                            commandArguments.links.add(Pair(propertyName, identity))
                             if (commaOrEndBracket.tokenType == TokenType.COMMA) {
                                 continue
                             } else {
@@ -137,8 +137,8 @@ class Stroll(private val entityStore: PersistentEntityStore) {
             entity.setLink(it.key, linkedEntity)
         }
         commandArguments.links.forEach {
-            val linkedEntity = transaction.getEntity(transaction.toEntityId(it.value.tokenContent))
-            entity.addLink(it.key, linkedEntity)
+            val linkedEntity = transaction.getEntity(transaction.toEntityId(it.second.tokenContent))
+            entity.addLink(it.first, linkedEntity)
         }
     }
 
@@ -249,18 +249,23 @@ class Stroll(private val entityStore: PersistentEntityStore) {
                 resultLists.add(result)
             }
             commandArguments.links.forEach { link ->
-                val links = transaction.findLinks(entityType, transaction.getEntity(transaction.toEntityId(link.value.tokenContent)), link.key)
+                val links = transaction.findLinks(entityType, transaction.getEntity(transaction.toEntityId(link.second.tokenContent)), link.first)
                 val result = entityIterableToListEntityId(links)
                 resultLists.add(result)
             }
-            commandArguments.propertyExistsCheck.forEach {
-                //TODO for property exists
+            commandArguments.propertyExistsCheck.forEach { propertyName ->
+                val withProp = transaction.findWithProp(entityType, propertyName)
+                val result = entityIterableToListEntityId(withProp)
+                resultLists.add(result)
             }
-            commandArguments.linkExistsCheck.forEach {
-                //TODO for link exists
+            commandArguments.linkExistsCheck.forEach { linkName ->
+                val withLinks = transaction.findWithLinks(entityType, linkName)
+                val result = entityIterableToListEntityId(withLinks)
+                resultLists.add(result)
             }
             //TODO eventually handle ranges and startsWith here
         }
+
         val resultItr = resultLists.iterator()
 
         return if (!resultItr.hasNext()) {
@@ -270,9 +275,9 @@ class Stroll(private val entityStore: PersistentEntityStore) {
                 }
             }
         } else {
-            var workingResults = mutableListOf<EntityId>().toMutableList()
+            var workingResults = resultItr.next().toMutableList()
             while (resultItr.hasNext()) {
-                workingResults = workingResults.union(resultItr.next()).toMutableList()
+                workingResults = workingResults.intersect(resultItr.next()).toMutableList()
             }
             workingResults
         }
