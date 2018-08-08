@@ -226,17 +226,36 @@ class Stroll(private val entityStore: PersistentEntityStore) {
         val entityType: String = itr.next().tokenContent
 
         val commandArguments = readCommandArguments(itr) ?: throw RuntimeException()
+
+        if (commandArguments.link.isEmpty() &&
+            commandArguments.links.isEmpty() &&
+            commandArguments.linkExistsCheck.isEmpty() &&
+            commandArguments.properties.isEmpty() &&
+            commandArguments.propertyExistsCheck.isEmpty()) {
+            return entityStore.computeInReadonlyTransaction {
+                it.getAll(entityType).map {
+                    it.id
+                }
+            }
+        }
+
         val resultList: MutableList<EntityId> = mutableListOf()
         entityStore.executeInReadonlyTransaction { transaction ->
-            //TODO for properties
-
-            //TODO for single links
-
-            //TODO for multiple links
-
-            //TODO for property exists
-
-            //TODO for link exists
+            commandArguments.properties.forEach {
+                //TODO for properties
+            }
+            commandArguments.link.forEach {
+                //TODO for single links
+            }
+            commandArguments.links.forEach {
+                //TODO for multiple links
+            }
+            commandArguments.propertyExistsCheck.forEach {
+                //TODO for property exists
+            }
+            commandArguments.linkExistsCheck.forEach {
+                //TODO for link exists
+            }
         }
         return resultList
     }

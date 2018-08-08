@@ -12,7 +12,7 @@ Example usage from within Kotlin with explicit return types:
 
 ```kotlin
 val stroll = Stroll(entityStore)
-val alexId: EntityId = stroll.runNew("""new User { name: "Alex", hp: 42, employer => Employer#3 }""")
+val alexId: EntityId = stroll.runNew("""new User { name: "Alex", hp: 42, employer => 8-3 }""")
 val billId: EntityId = stroll.runNew("""new Character { name: "Billy Lee", games => [ 0-34, 0-344, 0-324,0-134 ], rightsHolder -> 2-404 }""")
 stroll.runDelete("""delete 1-55""") //returns nothing
 stroll.runDelete("""delete [1-55, 1-556]""") //returns nothing
