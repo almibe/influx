@@ -28,9 +28,14 @@ import org.almibe.stroll.tokenizer.TokenType
 import org.almibe.stroll.tokenizer.Tokenizer
 
 data class CommandArguments (
+        //three collections used by all commands
         val properties: MutableMap<String, StrollToken> = mutableMapOf(),
         val link: MutableMap<String, StrollToken> = mutableMapOf(),
-        val links: MutableMap<String, StrollToken> = mutableMapOf()
+        val links: MutableMap<String, StrollToken> = mutableMapOf(),
+        //collections only used by find
+        val rangeProperties: MutableMap<String, Pair<StrollToken, StrollToken>> = mutableMapOf(),
+        val propertyExistsCheck: MutableList<String> = mutableListOf(),
+        val linkExistsCheck: MutableList<String> = mutableListOf()
 )
 
 class Stroll(private val entityStore: PersistentEntityStore) {
@@ -64,6 +69,7 @@ class Stroll(private val entityStore: PersistentEntityStore) {
                             TokenType.DOUBLE -> commandArguments.properties[propertyName] = value
                             TokenType.LONG -> commandArguments.properties[propertyName] = value
                             TokenType.STRING -> commandArguments.properties[propertyName] = value
+                            TokenType.UNDERSCORE -> commandArguments.propertyExistsCheck.add(propertyName)
                             TokenType.KEYWORD -> {
                                 assert(value.tokenContent == "true" || value.tokenContent == "false")
                                 commandArguments.properties[propertyName] = value
@@ -72,8 +78,12 @@ class Stroll(private val entityStore: PersistentEntityStore) {
                         }
                     } else if (colonOrLink.tokenType == TokenType.ARROW && value.tokenType == TokenType.IDENTITY) {
                         commandArguments.link[propertyName] = value
+                    } else if (colonOrLink.tokenType == TokenType.ARROW && value.tokenType == TokenType.UNDERSCORE) {
+                        commandArguments.linkExistsCheck.add(propertyName)
                     } else if (colonOrLink.tokenType == TokenType.FAT_ARROW && value.tokenType == TokenType.IDENTITY) {
                         commandArguments.links[propertyName] = value
+                    } else if (colonOrLink.tokenType == TokenType.FAT_ARROW && value.tokenType == TokenType.UNDERSCORE) {
+                        commandArguments.linkExistsCheck.add(propertyName)
                     } else if (colonOrLink.tokenType == TokenType.FAT_ARROW && value.tokenType == TokenType.START_BRACKET) {
                         while (true) {
                             val identity = itr.next()
@@ -209,7 +219,7 @@ class Stroll(private val entityStore: PersistentEntityStore) {
         }
     }
 
-    fun runFind(commandString: String): List<EntityId>? {
+    fun runFind(commandString: String): List<EntityId> {
         val itr: Iterator<StrollToken> = tokenize(commandString)
         val find = itr.next()
         assert(find.tokenType == TokenType.KEYWORD && find.tokenContent == "find")
@@ -220,9 +230,11 @@ class Stroll(private val entityStore: PersistentEntityStore) {
         assert(endBrace.tokenType == TokenType.END_BRACE)
         assert(!itr.hasNext())
 
+        val commandArguments = readCommandArguments(itr) ?: throw RuntimeException()
+        val resultList: MutableList<EntityId> = mutableListOf()
         entityStore.executeInReadonlyTransaction { transaction ->
-
+            TODO()
         }
-        return listOf()
+        return resultList
     }
 }
