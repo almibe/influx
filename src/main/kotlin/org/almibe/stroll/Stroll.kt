@@ -58,9 +58,14 @@ class Stroll(private val entityStore: PersistentEntityStore) {
                     val colonOrLink = itr.next()
                     val value = itr.next()
 
-                    if (colonOrLink.tokenType == TokenType.COLON &&
-                            (value.tokenType == TokenType.NUMBER || value.tokenType == TokenType.STRING)) {
-                        commandArguments.properties[propertyName] = value
+                    if (colonOrLink.tokenType == TokenType.COLON) {
+                        when (value.tokenType) {
+                            TokenType.INT -> commandArguments.properties[propertyName] = value
+                            TokenType.DOUBLE -> commandArguments.properties[propertyName] = value
+                            TokenType.CHAR -> commandArguments.properties[propertyName] = value
+                            TokenType.STRING -> commandArguments.properties[propertyName] = value
+                            else -> throw RuntimeException("Unexpected value after colon $value")
+                        }
                     } else if (colonOrLink.tokenType == TokenType.ARROW && value.tokenType == TokenType.IDENTITY) {
                         commandArguments.link[propertyName] = value
                     } else if (colonOrLink.tokenType == TokenType.FAT_ARROW && value.tokenType == TokenType.IDENTITY) {

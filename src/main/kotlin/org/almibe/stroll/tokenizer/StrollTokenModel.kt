@@ -21,7 +21,10 @@ package org.almibe.stroll.tokenizer
 
 enum class TokenType {
     STRING,
-    NUMBER,
+    CHAR,
+    INT,
+    LONG,
+    DOUBLE,
     KEYWORD, //any character string out of quotes
     ARROW, // -> outside of quotes
     FAT_ARROW, // => outside of quotes
@@ -32,8 +35,7 @@ enum class TokenType {
     END_BRACKET,
     COMMA,
     IDENTITY,
-    UNDERSCORE,
-    CHAR
+    UNDERSCORE
 }
 
 data class StrollToken(val tokenType: TokenType, val tokenContent: String)
