@@ -64,8 +64,8 @@ class StrollSpec : StringSpec({
         result.typeId shouldBe 0
     }
 
-    "support six major types" {
-        val command = "new TypeTest { char: 'a', int: 3, long: 1009L, double: 3.14, string: \"Test\", boolean: true }"
+    "support five major types" {
+        val command = "new TypeTest { int: 3, long: 1009L, double: 3.14, string: \"Test\", boolean: true }"
         val result = stroll.runNew(command)!!
         result.localId shouldBe 0L
         result.typeId shouldBe 1

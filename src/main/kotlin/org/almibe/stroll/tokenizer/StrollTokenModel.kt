@@ -21,7 +21,6 @@ package org.almibe.stroll.tokenizer
 
 enum class TokenType {
     STRING, //character string in double quotes
-    CHAR, //single character in single quotes
     INT, //any fixed point number that doesn't end with L
     LONG, //any fixed point number that ends with L
     DOUBLE, //any floating point number -- stroll doesn't support floats

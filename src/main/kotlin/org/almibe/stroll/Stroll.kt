@@ -62,8 +62,12 @@ class Stroll(private val entityStore: PersistentEntityStore) {
                         when (value.tokenType) {
                             TokenType.INT -> commandArguments.properties[propertyName] = value
                             TokenType.DOUBLE -> commandArguments.properties[propertyName] = value
-                            TokenType.CHAR -> commandArguments.properties[propertyName] = value
+                            TokenType.LONG -> commandArguments.properties[propertyName] = value
                             TokenType.STRING -> commandArguments.properties[propertyName] = value
+                            TokenType.KEYWORD -> {
+                                assert(value.tokenContent == "true" || value.tokenContent == "false")
+                                commandArguments.properties[propertyName] = value
+                            }
                             else -> throw RuntimeException("Unexpected value after colon $value")
                         }
                     } else if (colonOrLink.tokenType == TokenType.ARROW && value.tokenType == TokenType.IDENTITY) {
@@ -115,7 +119,7 @@ class Stroll(private val entityStore: PersistentEntityStore) {
                 TokenType.LONG -> entity.setProperty(property.key, property.value.tokenContent.toLong())
                 TokenType.INT -> entity.setProperty(property.key, property.value.tokenContent.toInt())
                 TokenType.STRING -> entity.setProperty(property.key, property.value.tokenContent)
-                TokenType.CHAR -> entity.setProperty(property.key, property.value.tokenContent.first())
+                //TokenType.CHAR -> entity.setProperty(property.key, property.value.tokenContent.first().toChar())
                 TokenType.KEYWORD -> entity.setProperty(property.key, property.value.tokenContent.toBoolean())
                 else -> {
                     throw RuntimeException("Property type must be string, char, boolean, int, long or double.")
