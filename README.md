@@ -35,9 +35,9 @@ Notes:
 
 `_` means this property or link has been set when used in a find `username: _` `spouse -> _`
 
-`to` is used to search for a range `age: 5 to 50`
+`to` is used to search for a range `age: 5 to 50` ** NOT SUPPORTED YET SEE ISSUE #9 **
 
-`startsWith` is used to search for a string that starts with a value `username: startsWith "bob"`
+`startsWith` is used to search for a string that starts with a value `username: startsWith "bob"` ** NOT SUPPORTED YET SEE ISSUE #9 **
 
 `update` replaces or adds properties & links
 
