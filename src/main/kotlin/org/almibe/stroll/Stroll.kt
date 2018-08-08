@@ -214,9 +214,15 @@ class Stroll(private val entityStore: PersistentEntityStore) {
         val find = itr.next()
         assert(find.tokenType == TokenType.KEYWORD && find.tokenContent == "find")
         val entityType: String = itr.next().tokenContent
+        val startBrace = itr.next()
+        assert(startBrace.tokenType == TokenType.START_BRACE)
+        val endBrace = itr.next()
+        assert(endBrace.tokenType == TokenType.END_BRACE)
+        assert(!itr.hasNext())
 
-        val commandArguments = readCommandArguments(itr) ?: throw RuntimeException()
+        entityStore.executeInReadonlyTransaction { transaction ->
 
-        TODO("finish")
+        }
+        return listOf()
     }
 }
