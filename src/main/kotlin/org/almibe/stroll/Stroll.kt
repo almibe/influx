@@ -33,9 +33,9 @@ data class CommandArguments (
         val link: MutableMap<String, StrollToken> = mutableMapOf(),
         val links: MutableMap<String, StrollToken> = mutableMapOf(),
         //collections only used by find
-        val rangeProperties: MutableMap<String, Pair<StrollToken, StrollToken>> = mutableMapOf(),
         val propertyExistsCheck: MutableList<String> = mutableListOf(),
         val linkExistsCheck: MutableList<String> = mutableListOf()
+        //TODO eventually this will contain range and startsWith info
 )
 
 class Stroll(private val entityStore: PersistentEntityStore) {
@@ -224,16 +224,19 @@ class Stroll(private val entityStore: PersistentEntityStore) {
         val find = itr.next()
         assert(find.tokenType == TokenType.KEYWORD && find.tokenContent == "find")
         val entityType: String = itr.next().tokenContent
-        val startBrace = itr.next()
-        assert(startBrace.tokenType == TokenType.START_BRACE)
-        val endBrace = itr.next()
-        assert(endBrace.tokenType == TokenType.END_BRACE)
-        assert(!itr.hasNext())
 
         val commandArguments = readCommandArguments(itr) ?: throw RuntimeException()
         val resultList: MutableList<EntityId> = mutableListOf()
         entityStore.executeInReadonlyTransaction { transaction ->
-            TODO()
+            //TODO for properties
+
+            //TODO for single links
+
+            //TODO for multiple links
+
+            //TODO for property exists
+
+            //TODO for link exists
         }
         return resultList
     }
