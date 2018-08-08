@@ -19,10 +19,7 @@ under the License.
 
 package org.almibe.stroll
 
-import jetbrains.exodus.entitystore.Entity
-import jetbrains.exodus.entitystore.EntityId
-import jetbrains.exodus.entitystore.PersistentEntityStore
-import jetbrains.exodus.entitystore.StoreTransaction
+import jetbrains.exodus.entitystore.*
 import org.almibe.stroll.tokenizer.StrollToken
 import org.almibe.stroll.tokenizer.TokenType
 import org.almibe.stroll.tokenizer.Tokenizer
@@ -227,22 +224,23 @@ class Stroll(private val entityStore: PersistentEntityStore) {
 
         val commandArguments = readCommandArguments(itr) ?: throw RuntimeException()
 
-        if (commandArguments.link.isEmpty() &&
-            commandArguments.links.isEmpty() &&
-            commandArguments.linkExistsCheck.isEmpty() &&
-            commandArguments.properties.isEmpty() &&
-            commandArguments.propertyExistsCheck.isEmpty()) {
-            return entityStore.computeInReadonlyTransaction {
-                it.getAll(entityType).map {
-                    it.id
-                }
-            }
-        }
-
-        val resultList: MutableList<EntityId> = mutableListOf()
+        val resultLists: MutableList<List<EntityId>> = mutableListOf()
         entityStore.executeInReadonlyTransaction { transaction ->
             commandArguments.properties.forEach {
-                //TODO for properties
+                val result = when(it.value.tokenType) {
+                    TokenType.INT -> entityIterableToListEntityId(
+                                transaction.find(entityType, it.key, it.value.tokenContent.toInt()))
+                    TokenType.DOUBLE -> entityIterableToListEntityId(
+                            transaction.find(entityType, it.key, it.value.tokenContent.toDouble()))
+                    TokenType.LONG -> entityIterableToListEntityId(
+                            transaction.find(entityType, it.key, it.value.tokenContent.toLong()))
+                    TokenType.STRING -> entityIterableToListEntityId(
+                            transaction.find(entityType, it.key, it.value.tokenContent.toString()))
+                    TokenType.KEYWORD -> entityIterableToListEntityId(
+                            transaction.find(entityType, it.key, it.value.tokenContent.toBoolean()))
+                    else -> throw RuntimeException()
+                }
+                resultLists.add(result)
             }
             commandArguments.link.forEach {
                 //TODO for single links
@@ -256,7 +254,28 @@ class Stroll(private val entityStore: PersistentEntityStore) {
             commandArguments.linkExistsCheck.forEach {
                 //TODO for link exists
             }
+            //TODO eventually handle ranges and startsWith here
         }
-        return resultList
+        val resultItr = resultLists.iterator()
+
+        return if (!resultItr.hasNext()) {
+            entityStore.computeInReadonlyTransaction {
+                it.getAll(entityType).map {
+                    it.id
+                }
+            }
+        } else {
+            var workingResults = mutableListOf<EntityId>().toMutableList()
+            while (resultItr.hasNext()) {
+                workingResults = workingResults.union(resultItr.next()).toMutableList()
+            }
+            workingResults
+        }
+    }
+
+    private fun entityIterableToListEntityId(entityIterable: EntityIterable): List<EntityId> {
+        return entityIterable.map {
+            it.id
+        }
     }
 }
