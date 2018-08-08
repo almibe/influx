@@ -118,11 +118,11 @@ class Tokenizer {
         val number = StringBuilder(firstChar.toString())
 
         if (!itr.hasNext()) {
-            tokens.add(StrollToken(TokenType.NUMBER, number.toString()))
+            tokens.add(StrollToken(TokenType.INT, number.toString()))
             return
         }
         var currentChar: Char? = itr.next()
-        while (currentChar in '0'..'9' || currentChar == '.' || currentChar == '-') {
+        while (currentChar in '0'..'9' || currentChar == '.' || currentChar == '-' || currentChar == 'L') {
             number.append(currentChar)
             if (itr.hasNext()) {
                 currentChar = itr.next()
@@ -132,8 +132,9 @@ class Tokenizer {
             }
         }
         when {
-            number.matches(Regex("[0-9]+")) -> tokens.add(StrollToken(TokenType.NUMBER, number.toString()))
-            number.matches(Regex("[0-9]+\\.[0-9]+")) -> tokens.add(StrollToken(TokenType.NUMBER, number.toString()))
+            number.matches(Regex("[0-9]+")) -> tokens.add(StrollToken(TokenType.INT, number.toString()))
+            number.matches(Regex("[0-9]+L")) -> tokens.add(StrollToken(TokenType.LONG, number.toString()))
+            number.matches(Regex("[0-9]+\\.[0-9]+")) -> tokens.add(StrollToken(TokenType.DOUBLE, number.toString()))
             number.matches(Regex("[0-9]+-[0-9]+")) -> tokens.add(StrollToken(TokenType.IDENTITY, number.toString()))
             else -> throw RuntimeException("Number incorrectly formed $number.")
         }

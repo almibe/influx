@@ -176,6 +176,11 @@ class Stroll(private val entityStore: PersistentEntityStore) {
         }
     }
 
+    fun runDelete(commandString: String) {
+        val itr: Iterator<StrollToken> = tokenize(commandString)
+        TODO()
+    }
+
     fun runFind(commandString: String): List<EntityId>? {
         val itr: Iterator<StrollToken> = tokenize(commandString)
         val find = itr.next()
@@ -185,10 +190,5 @@ class Stroll(private val entityStore: PersistentEntityStore) {
         val commandArguments = readCommandArguments(itr) ?: throw RuntimeException()
 
         TODO("finish")
-    }
-
-    fun runDelete(commandString: String) {
-        val itr: Iterator<StrollToken> = tokenize(commandString)
-        TODO()
     }
 }

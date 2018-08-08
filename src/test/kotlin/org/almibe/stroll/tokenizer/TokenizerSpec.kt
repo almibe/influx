@@ -56,28 +56,42 @@ class TokenizerSpec : StringSpec({
     "int test" {
         val command = "6"
         val tokens = tokenizer.tokenize(command)
-        tokens[0] shouldBe StrollToken(TokenType.NUMBER, "6")
+        tokens[0] shouldBe StrollToken(TokenType.INT, "6")
         tokens.size shouldBe 1
     }
 
     "double digit int test" {
         val command = "42"
         val tokens = tokenizer.tokenize(command)
-        tokens[0] shouldBe StrollToken(TokenType.NUMBER, "42")
+        tokens[0] shouldBe StrollToken(TokenType.INT, "42")
         tokens.size shouldBe 1
     }
 
-    "zero float test" {
+    "long test" {
+        val command = "6L"
+        val tokens = tokenizer.tokenize(command)
+        tokens[0] shouldBe StrollToken(TokenType.LONG, "6L")
+        tokens.size shouldBe 1
+    }
+
+    "double digit long test" {
+        val command = "42L"
+        val tokens = tokenizer.tokenize(command)
+        tokens[0] shouldBe StrollToken(TokenType.LONG, "42L")
+        tokens.size shouldBe 1
+    }
+
+    "zero double test" {
         val command = "0.0"
         val tokens = tokenizer.tokenize(command)
-        tokens[0] shouldBe StrollToken(TokenType.NUMBER, "0.0")
+        tokens[0] shouldBe StrollToken(TokenType.DOUBLE, "0.0")
         tokens.size shouldBe 1
     }
 
-    "float test" {
+    "double test" {
         val command = "42.420"
         val tokens = tokenizer.tokenize(command)
-        tokens[0] shouldBe StrollToken(TokenType.NUMBER, "42.420")
+        tokens[0] shouldBe StrollToken(TokenType.DOUBLE, "42.420")
         tokens.size shouldBe 1
     }
 
@@ -142,7 +156,7 @@ class TokenizerSpec : StringSpec({
         tokens[0] shouldBe StrollToken(TokenType.START_BRACE, "{")
         tokens[1] shouldBe StrollToken(TokenType.KEYWORD, "age")
         tokens[2] shouldBe StrollToken(TokenType.COLON, ":")
-        tokens[3] shouldBe StrollToken(TokenType.NUMBER, "42")
+        tokens[3] shouldBe StrollToken(TokenType.INT, "42")
         tokens[4] shouldBe StrollToken(TokenType.END_BRACE, "}")
         tokens.size shouldBe 5
     }
@@ -181,7 +195,7 @@ class TokenizerSpec : StringSpec({
         tokens[6] shouldBe StrollToken(TokenType.COMMA, ",")
         tokens[7] shouldBe StrollToken(TokenType.KEYWORD, "age")
         tokens[8] shouldBe StrollToken(TokenType.COLON, ":")
-        tokens[9] shouldBe StrollToken(TokenType.NUMBER, "42")
+        tokens[9] shouldBe StrollToken(TokenType.INT, "42")
         tokens[10] shouldBe StrollToken(TokenType.END_BRACE, "}")
         tokens.size shouldBe 11
     }
