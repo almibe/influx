@@ -16,7 +16,7 @@ val alexId: EntityId = stroll.runNew("""new User { name: "Alex", hp: 42, employe
 val billId: EntityId = stroll.runNew("""new Character { name: "Billy Lee", games => [ 0-34, 0-344, 0-324,0-134 ], rightsHolder -> 2-404 }""")
 stroll.runDelete("""delete 1-55""") //returns nothing
 stroll.runDelete("""delete [1-55, 1-556]""") //returns nothing
-val entityIds: List<EntityId> = stroll.rulFind("""find Character { games => 0-45 }""")
+val entityIds: List<EntityId> = stroll.runFind("""find Character { games => 0-45 }""")
 stroll.runUpdate("""update 1-44 { name: "Chuck Rock" }""") //returns nothing
 stroll.runSet("""set 1-45 { name: "Bobert" }""") //returns nothing
 ```
