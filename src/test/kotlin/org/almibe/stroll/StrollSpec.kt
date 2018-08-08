@@ -105,17 +105,17 @@ class StrollSpec : StringSpec({
         stroll.runDelete(command)
     }
 
-    "test that all DeleteTest entites have been deleted" {
+    "find that all DeleteTest entites have been deleted" {
         val command = "find DeleteTest {}"
         val result = stroll.runFind(command)!!
         result.size shouldBe 0
     }
-    "test finding all Users" {
+    "find all Users" {
         val command = "find User {}"
         val result = stroll.runFind(command)!!
         result.size shouldBe 5
     }
-    "test finding User based on properties" {
+    "find User based on properties" {
         val command = "find User { age: 24 }"
         val result = stroll.runFind(command)!!
         result.size shouldBe 1
@@ -125,7 +125,7 @@ class StrollSpec : StringSpec({
         result2.size shouldBe 1
     }
 
-    "test finding User based on links" {
+    "find User based on links" {
         val command = "find User { supervises => [ 0-1, 0-3 ] }"
         val result = stroll.runFind(command)!!
         result.size shouldBe 1
@@ -135,7 +135,7 @@ class StrollSpec : StringSpec({
         result2.size shouldBe 1
     }
 
-    "test finding Users with property and link exists queries" {
+    "find Users with property and link exists queries" {
         val command = "find User { supervises => _ }"
         val result = stroll.runFind(command)!!
         result.size shouldBe 1
@@ -149,13 +149,13 @@ class StrollSpec : StringSpec({
         result2.size shouldBe 1
     }
 
-    "test searching ranges with to" {
+    "find within a range using to" {
         val command = "find User { age: 40 to 49 }"
         val result = stroll.runFind(command)!!
         result.size shouldBe 1
     }
 
-    "test using startsWith" {
+    "find using startsWith" {
         val command = "find User { name: startsWith \"Ma\" }"
         val result = stroll.runFind(command)!!
         result.size shouldBe 1
