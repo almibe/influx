@@ -111,18 +111,14 @@ class Stroll(private val entityStore: PersistentEntityStore) {
     private fun setPropertiesAndLinks(transaction: StoreTransaction, entity: Entity, commandArguments: CommandArguments) {
         commandArguments.properties.forEach { property ->
             when (property.value.tokenType) {
-                TokenType.NUMBER -> {
-                    if (property.value.tokenContent.contains('.')) {
-                        entity.setProperty(property.key, property.value.tokenContent.toDouble())
-                    } else {
-                        entity.setProperty(property.key, property.value.tokenContent.toLong())
-                    }
-                }
-                TokenType.STRING -> {
-                    entity.setProperty(property.key, property.value.tokenContent)
-                }
+                TokenType.DOUBLE -> entity.setProperty(property.key, property.value.tokenContent.toDouble())
+                TokenType.LONG -> entity.setProperty(property.key, property.value.tokenContent.toLong())
+                TokenType.INT -> entity.setProperty(property.key, property.value.tokenContent.toInt())
+                TokenType.STRING -> entity.setProperty(property.key, property.value.tokenContent)
+                TokenType.CHAR -> entity.setProperty(property.key, property.value.tokenContent.first())
+                TokenType.KEYWORD -> entity.setProperty(property.key, property.value.tokenContent.toBoolean())
                 else -> {
-                    throw RuntimeException("Property type must be string or number")
+                    throw RuntimeException("Property type must be string, char, boolean, int, long or double.")
                 }
             }
         }
