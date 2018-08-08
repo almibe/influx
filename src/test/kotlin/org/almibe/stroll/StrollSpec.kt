@@ -131,11 +131,11 @@ class StrollSpec : StringSpec({
         result.size shouldBe 1
     }
 
-    "find User based on links" {
-        val command = "find User { supervises => [ 0-1, 0-3 ] }"
-        val result = stroll.runFind(command)
-        result.size shouldBe 1
-    }
+//    "find User based on links" {
+//        val command = "find User { supervises => [ 0-1, 0-3 ] }"
+//        val result = stroll.runFind(command)
+//        result.size shouldBe 1
+//    }
 
     "find Users with property and link exists queries" {
         val command = "find User { supervises => _ }"
@@ -151,19 +151,19 @@ class StrollSpec : StringSpec({
         result2.size shouldBe 1
     }
 
-    "find within a range using to" {
-        val command = "find User { age: 40 to 49 }"
-        val result = stroll.runFind(command)
-        result.size shouldBe 1
-    }
-
-    "find using startsWith" {
-        val command = "find User { name: startsWith \"Ma\" }"
-        val result = stroll.runFind(command)
-        result.size shouldBe 1
-
-        val command1 = "find User { name: startsWith \"B\" }"
-        val result1 = stroll.runFind(command1)
-        result1.size shouldBe 2
-    }
+//    "find within a range using to" {
+//        val command = "find User { age: 40 to 49 }"
+//        val result = stroll.runFind(command)
+//        result.size shouldBe 1
+//    }
+//
+//    "find using startsWith" {
+//        val command = "find User { name: startsWith \"Ma\" }"
+//        val result = stroll.runFind(command)
+//        result.size shouldBe 1
+//
+//        val command1 = "find User { name: startsWith \"B\" }"
+//        val result1 = stroll.runFind(command1)
+//        result1.size shouldBe 2
+//    }
 })

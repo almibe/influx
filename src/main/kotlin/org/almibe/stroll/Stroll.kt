@@ -243,14 +243,15 @@ class Stroll(private val entityStore: PersistentEntityStore) {
                 resultLists.add(result)
             }
             commandArguments.link.forEach { link ->
+
                 val links = transaction.findLinks(entityType, transaction.getEntity(transaction.toEntityId(link.value.tokenContent)), link.key)
                 val result = entityIterableToListEntityId(links)
                 resultLists.add(result)
             }
             commandArguments.links.forEach { link ->
-//                val links = transaction.findLinks(entityType, transaction.getEntity(transaction.toEntityId(link.value.tokenContent)), link.key)
-//                val result = entityIterableToListEntityId(links)
-//                resultLists.add(result)
+                val links = transaction.findLinks(entityType, transaction.getEntity(transaction.toEntityId(link.value.tokenContent)), link.key)
+                val result = entityIterableToListEntityId(links)
+                resultLists.add(result)
             }
             commandArguments.propertyExistsCheck.forEach {
                 //TODO for property exists
