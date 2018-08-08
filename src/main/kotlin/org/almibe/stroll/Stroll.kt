@@ -226,27 +226,31 @@ class Stroll(private val entityStore: PersistentEntityStore) {
 
         val resultLists: MutableList<List<EntityId>> = mutableListOf()
         entityStore.executeInReadonlyTransaction { transaction ->
-            commandArguments.properties.forEach {
-                val result = when(it.value.tokenType) {
+            commandArguments.properties.forEach { property ->
+                val result = when(property.value.tokenType) {
                     TokenType.INT -> entityIterableToListEntityId(
-                                transaction.find(entityType, it.key, it.value.tokenContent.toInt()))
+                                transaction.find(entityType, property.key, property.value.tokenContent.toInt()))
                     TokenType.DOUBLE -> entityIterableToListEntityId(
-                            transaction.find(entityType, it.key, it.value.tokenContent.toDouble()))
+                            transaction.find(entityType, property.key, property.value.tokenContent.toDouble()))
                     TokenType.LONG -> entityIterableToListEntityId(
-                            transaction.find(entityType, it.key, it.value.tokenContent.toLong()))
+                            transaction.find(entityType, property.key, property.value.tokenContent.toLong()))
                     TokenType.STRING -> entityIterableToListEntityId(
-                            transaction.find(entityType, it.key, it.value.tokenContent.toString()))
+                            transaction.find(entityType, property.key, property.value.tokenContent.toString()))
                     TokenType.KEYWORD -> entityIterableToListEntityId(
-                            transaction.find(entityType, it.key, it.value.tokenContent.toBoolean()))
+                            transaction.find(entityType, property.key, property.value.tokenContent.toBoolean()))
                     else -> throw RuntimeException()
                 }
                 resultLists.add(result)
             }
-            commandArguments.link.forEach {
-                //TODO for single links
+            commandArguments.link.forEach { link ->
+                val links = transaction.findLinks(entityType, transaction.getEntity(transaction.toEntityId(link.value.tokenContent)), link.key)
+                val result = entityIterableToListEntityId(links)
+                resultLists.add(result)
             }
-            commandArguments.links.forEach {
-                //TODO for multiple links
+            commandArguments.links.forEach { link ->
+//                val links = transaction.findLinks(entityType, transaction.getEntity(transaction.toEntityId(link.value.tokenContent)), link.key)
+//                val result = entityIterableToListEntityId(links)
+//                resultLists.add(result)
             }
             commandArguments.propertyExistsCheck.forEach {
                 //TODO for property exists
