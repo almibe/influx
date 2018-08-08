@@ -181,7 +181,32 @@ class Stroll(private val entityStore: PersistentEntityStore) {
 
     fun runDelete(commandString: String) {
         val itr: Iterator<StrollToken> = tokenize(commandString)
-        TODO()
+        val delete = itr.next()
+        assert(delete.tokenType == TokenType.KEYWORD && delete.tokenContent == "delete")
+        val startBracketOrIdentity = itr.next()
+
+        entityStore.executeInTransaction { transaction ->
+            when (startBracketOrIdentity.tokenType) {
+                TokenType.START_BRACKET -> {
+                    var next = itr.next()
+                    while (next.tokenType == TokenType.IDENTITY) {
+                        val entity = transaction.getEntity(transaction.toEntityId(next.tokenContent))
+                        entity.delete()
+
+                        next = itr.next()
+                        if (next.tokenType == TokenType.COMMA) {
+                            next = itr.next()
+                        }
+                    }
+                    assert(next.tokenType == TokenType.END_BRACKET)
+                }
+                TokenType.IDENTITY -> {
+                    val entity = transaction.getEntity(transaction.toEntityId(startBracketOrIdentity.tokenContent))
+                    entity.delete()
+                }
+                else -> throw RuntimeException("Unexpected argument passed to delete $startBracketOrIdentity")
+            }
+        }
     }
 
     fun runFind(commandString: String): List<EntityId>? {

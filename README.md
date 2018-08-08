@@ -47,8 +47,6 @@ All floating point numbers are double
 
 All fixed point numbers all ints unless they have an L after them then they are Longs
 
-Chars are in single quotes and strings are in double quotes
-
 Booleans are represented with the keyword true or false
 
 Stroll does not support nulls
