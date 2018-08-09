@@ -8,17 +8,16 @@ within the context of debugging or management.
 
 See `org.almibe.stroll.StrollSpec` in `src/test/kotlin` and issues for current status.
 
-Example usage from within Kotlin with explicit return types:
+Example commands
 
-```kotlin
-val stroll = Stroll(entityStore)
-val alexId: EntityId = stroll.runNew("""new User { name: "Alex", hp: 42, employer => 8-3 }""")
-val billId: EntityId = stroll.runNew("""new Character { name: "Billy Lee", games => [ 0-34, 0-344, 0-324,0-134 ], rightsHolder -> 2-404 }""")
-stroll.runDelete("""delete 1-55""") //returns nothing
-stroll.runDelete("""delete [1-55, 1-556]""") //returns nothing
-val entityIds: List<EntityId> = stroll.runFind("""find Character { games => 0-45 }""")
-stroll.runUpdate("""update 1-44 { name: "Chuck Rock" }""") //returns nothing
-stroll.runSet("""set 1-45 { name: "Bobert" }""") //returns nothing
+```
+new User { name: "Alex", hp: 42, employer => 8-3 }
+new Character { name: "Billy Lee", games => [ 0-34, 0-344, 0-324,0-134 ], rightsHolder -> 2-404 }
+delete 1-55
+delete [1-55, 1-556]
+find Character { games => 0-45 }
+update 1-44 { name: "Chuck Rock" }
+set 1-45 { name: "Bobert" }
 ```
 
 Notes:
