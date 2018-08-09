@@ -347,6 +347,9 @@ class Stroll(private val entityStore: PersistentEntityStore) {
             jsonArrayLinks.add(it)
         }
 
+        result.addProperty("entityType", entity.type)
+        result.addProperty("entityId", entity.toIdString())
+
         result.add("properties", jsonArrayProperties)
         result.add("links", jsonArrayLinks)
 
