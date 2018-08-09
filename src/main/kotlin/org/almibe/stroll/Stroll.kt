@@ -19,7 +19,11 @@ under the License.
 
 package org.almibe.stroll
 
-import jetbrains.exodus.entitystore.*
+import com.google.gson.JsonArray
+import com.google.gson.JsonObject
+import jetbrains.exodus.entitystore.Entity
+import jetbrains.exodus.entitystore.PersistentEntityStore
+import jetbrains.exodus.entitystore.StoreTransaction
 import org.almibe.stroll.tokenizer.StrollToken
 import org.almibe.stroll.tokenizer.TokenType
 import org.almibe.stroll.tokenizer.Tokenizer
@@ -37,6 +41,21 @@ data class CommandArguments (
 
 class Stroll(private val entityStore: PersistentEntityStore) {
     private val tokenizer = Tokenizer()
+
+    fun run(command: String): JsonObject {
+        return when (command.trim().split(" ").first()) {
+            "find" -> runFind(command)
+            "update" -> runUpdate(command)
+            "set" -> runSet(command)
+            "delete" -> runDelete(command)
+            "new" -> runNew(command)
+            else -> {
+                val jsonObject = JsonObject()
+                jsonObject.addProperty("error", "Invalid command - $command")
+                jsonObject
+            }
+        }
+    }
 
     private fun tokenize(command: String): Iterator<StrollToken> = tokenizer.tokenize(command).iterator()
 
@@ -142,7 +161,7 @@ class Stroll(private val entityStore: PersistentEntityStore) {
         }
     }
 
-    fun runNew(commandString: String): EntityId? {
+    private fun runNew(commandString: String): JsonObject {
         val itr: Iterator<StrollToken> = tokenize(commandString)
         val new = itr.next()
         assert(new.tokenType == TokenType.KEYWORD && new.tokenContent == "new")
@@ -153,11 +172,15 @@ class Stroll(private val entityStore: PersistentEntityStore) {
         return entityStore.computeInTransaction { transaction ->
             val entity = transaction.newEntity(entityType)
             setPropertiesAndLinks(transaction, entity, commandArguments)
-            entity.id
+            val result = JsonObject()
+            result.addProperty("operation", "new")
+            entityToJsonObject(entity)
+            result.add("result", entityToJsonObject(entity))
+            result
         }
     }
 
-    fun runUpdate(commandString: String) {
+    private fun runUpdate(commandString: String): JsonObject {
         val itr: Iterator<StrollToken> = tokenize(commandString)
         val update = itr.next()
         assert(update.tokenType == TokenType.KEYWORD && update.tokenContent == "update")
@@ -165,40 +188,52 @@ class Stroll(private val entityStore: PersistentEntityStore) {
 
         val commandArguments = readCommandArguments(itr) ?: throw RuntimeException()
 
-        entityStore.executeInTransaction { transaction ->
+        return entityStore.computeInTransaction { transaction ->
             val entity = transaction.getEntity(transaction.toEntityId(entityId))
             setPropertiesAndLinks(transaction, entity, commandArguments)
+            val result = JsonObject()
+            result.addProperty("operation", "update")
+            entityToJsonObject(entity)
+            result.add("result", entityToJsonObject(entity))
+            result
         }
     }
 
-    fun runSet(commandString: String) {
+    private fun runSet(commandString: String): JsonObject {
         val itr: Iterator<StrollToken> = tokenize(commandString)
         val set = itr.next()
-        assert(set.tokenType == TokenType.KEYWORD && set.tokenContent == "update")
+        assert(set.tokenType == TokenType.KEYWORD && set.tokenContent == "set")
         val entityId: String = itr.next().tokenContent
 
         val commandArguments = readCommandArguments(itr) ?: throw RuntimeException()
 
-        entityStore.executeInTransaction { transaction ->
+        return entityStore.computeInTransaction { transaction ->
             val entity = transaction.getEntity(transaction.toEntityId(entityId))
             clearPropertiesAndLinks(entity)
             setPropertiesAndLinks(transaction, entity, commandArguments)
+            val result = JsonObject()
+            result.addProperty("operation", "set")
+            entityToJsonObject(entity)
+            result.add("result", entityToJsonObject(entity))
+            result
         }
     }
 
-    fun runDelete(commandString: String) {
+    private fun runDelete(commandString: String): JsonObject {
         val itr: Iterator<StrollToken> = tokenize(commandString)
         val delete = itr.next()
         assert(delete.tokenType == TokenType.KEYWORD && delete.tokenContent == "delete")
         val startBracketOrIdentity = itr.next()
 
-        entityStore.executeInTransaction { transaction ->
+        return entityStore.computeInTransaction { transaction ->
+            var total = 0
             when (startBracketOrIdentity.tokenType) {
                 TokenType.START_BRACKET -> {
                     var next = itr.next()
                     while (next.tokenType == TokenType.IDENTITY) {
                         val entity = transaction.getEntity(transaction.toEntityId(next.tokenContent))
                         entity.delete()
+                        total++
 
                         next = itr.next()
                         if (next.tokenType == TokenType.COMMA) {
@@ -210,13 +245,18 @@ class Stroll(private val entityStore: PersistentEntityStore) {
                 TokenType.IDENTITY -> {
                     val entity = transaction.getEntity(transaction.toEntityId(startBracketOrIdentity.tokenContent))
                     entity.delete()
+                    total++
                 }
                 else -> throw RuntimeException("Unexpected argument passed to delete $startBracketOrIdentity")
             }
+            val result = JsonObject()
+            result.addProperty("operation", "delete")
+            result.addProperty("total", total)
+            result
         }
     }
 
-    fun runFind(commandString: String): List<EntityId> {
+    private fun runFind(commandString: String): JsonObject {
         val itr: Iterator<StrollToken> = tokenize(commandString)
         val find = itr.next()
         assert(find.tokenType == TokenType.KEYWORD && find.tokenContent == "find")
@@ -224,68 +264,92 @@ class Stroll(private val entityStore: PersistentEntityStore) {
 
         val commandArguments = readCommandArguments(itr) ?: throw RuntimeException()
 
-        val resultLists: MutableList<List<EntityId>> = mutableListOf()
-        entityStore.executeInReadonlyTransaction { transaction ->
+        val resultLists: MutableList<List<Entity>> = mutableListOf()
+        return entityStore.computeInReadonlyTransaction { transaction ->
             commandArguments.properties.forEach { property ->
                 val result = when(property.value.tokenType) {
-                    TokenType.INT -> entityIterableToListEntityId(
-                                transaction.find(entityType, property.key, property.value.tokenContent.toInt()))
-                    TokenType.DOUBLE -> entityIterableToListEntityId(
-                            transaction.find(entityType, property.key, property.value.tokenContent.toDouble()))
-                    TokenType.LONG -> entityIterableToListEntityId(
-                            transaction.find(entityType, property.key, property.value.tokenContent.toLong()))
-                    TokenType.STRING -> entityIterableToListEntityId(
-                            transaction.find(entityType, property.key, property.value.tokenContent.toString()))
-                    TokenType.KEYWORD -> entityIterableToListEntityId(
-                            transaction.find(entityType, property.key, property.value.tokenContent.toBoolean()))
+                    TokenType.INT ->
+                        transaction.find(entityType, property.key, property.value.tokenContent.toInt()).toList()
+                    TokenType.DOUBLE ->
+                        transaction.find(entityType, property.key, property.value.tokenContent.toDouble()).toList()
+                    TokenType.LONG ->
+                        transaction.find(entityType, property.key, property.value.tokenContent.toLong()).toList()
+                    TokenType.STRING ->
+                        transaction.find(entityType, property.key, property.value.tokenContent.toString()).toList()
+                    TokenType.KEYWORD ->
+                        transaction.find(entityType, property.key, property.value.tokenContent.toBoolean()).toList()
                     else -> throw RuntimeException()
                 }
                 resultLists.add(result)
             }
             commandArguments.link.forEach { link ->
-
-                val links = transaction.findLinks(entityType, transaction.getEntity(transaction.toEntityId(link.value.tokenContent)), link.key)
-                val result = entityIterableToListEntityId(links)
-                resultLists.add(result)
+                val links = transaction.findLinks(entityType,
+                        transaction.getEntity(transaction.toEntityId(link.value.tokenContent)),
+                        link.key)
+                resultLists.add(links.toList())
             }
             commandArguments.links.forEach { link ->
-                val links = transaction.findLinks(entityType, transaction.getEntity(transaction.toEntityId(link.second.tokenContent)), link.first)
-                val result = entityIterableToListEntityId(links)
-                resultLists.add(result)
+                val links = transaction.findLinks(entityType,
+                        transaction.getEntity(transaction.toEntityId(link.second.tokenContent)),
+                        link.first)
+                resultLists.add(links.toList())
             }
             commandArguments.propertyExistsCheck.forEach { propertyName ->
                 val withProp = transaction.findWithProp(entityType, propertyName)
-                val result = entityIterableToListEntityId(withProp)
-                resultLists.add(result)
+                resultLists.add(withProp.toList())
             }
             commandArguments.linkExistsCheck.forEach { linkName ->
                 val withLinks = transaction.findWithLinks(entityType, linkName)
-                val result = entityIterableToListEntityId(withLinks)
-                resultLists.add(result)
+                resultLists.add(withLinks.toList())
             }
             //TODO eventually handle ranges and startsWith here
-        }
 
-        val resultItr = resultLists.iterator()
+            val result = JsonObject()
+            result.addProperty("operation", "find")
+            val resultItr = resultLists.iterator()
+            val resultArray = JsonArray()
+            result.add("results", resultArray)
 
-        return if (!resultItr.hasNext()) {
-            entityStore.computeInReadonlyTransaction {
-                it.getAll(entityType).map {
-                    it.id
+            if (!resultItr.hasNext()) {
+                transaction.getAll(entityType).forEach {
+                    resultArray.add(entityToJsonObject(it))
+                }
+            } else {
+                var workingResults = resultItr.next().toMutableList()
+                while (resultItr.hasNext()) {
+                    workingResults = workingResults.intersect(resultItr.next()).toMutableList()
+                }
+                workingResults.forEach {
+                    resultArray.add(entityToJsonObject(it))
                 }
             }
-        } else {
-            var workingResults = resultItr.next().toMutableList()
-            while (resultItr.hasNext()) {
-                workingResults = workingResults.intersect(resultItr.next()).toMutableList()
-            }
-            workingResults
+            result
         }
     }
 
-    private fun entityIterableToListEntityId(entityIterable: EntityIterable): List<EntityId> {
-        return entityIterable.map {
-            it.id
+    private fun entityToJsonObject(entity: Entity): JsonObject {
+        val properties = entity.propertyNames.map { propertyName ->
+            Pair(propertyName, entity.getProperty(propertyName).toString())
         }
+        val links = entity.linkNames
+
+        val result = JsonObject()
+        val jsonArrayProperties = JsonArray()
+        val jsonArrayLinks = JsonArray()
+
+        properties.forEach {
+            val property = JsonObject()
+            property.addProperty(it.first, it.second)
+            jsonArrayProperties.add(property)
+        }
+
+        links.forEach {
+            jsonArrayLinks.add(it)
+        }
+
+        result.add("properties", jsonArrayProperties)
+        result.add("links", jsonArrayLinks)
+
+        return result
     }
 }
