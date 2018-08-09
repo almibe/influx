@@ -113,51 +113,61 @@ class StrollSpec : StringSpec({
         result.getAsJsonPrimitive("total").asString shouldBe "2"
     }
 
-//    "find that all DeleteTest entites have been deleted" {
-//        val command = "find DeleteTest {}"
-//        val result = stroll.run(command)
-//        result.size shouldBe 0
-//    }
-//    "find all Users" {
-//        val command = "find User {}"
-//        val result = stroll.run(command)
-//        result.size shouldBe 5
-//    }
-//    "find User based on properties" {
-//        val command = "find User { age: 24 }"
-//        val result = stroll.run(command)
-//        result.size shouldBe 1
-//
-//        val command2 = "find User { name: \"Bill\", age: 45 }"
-//        val result2 = stroll.run(command2)
-//        result2.size shouldBe 1
-//    }
-//
-//    "find User based on link" {
-//        val command = "find User { contact -> 0-2, name: \"Margret\" }"
-//        val result = stroll.run(command)
-//        result.size shouldBe 1
-//    }
-//
-//    "find User based on links" {
-//        val command = "find User { supervises => [ 0-1, 0-3 ] }"
-//        val result = stroll.run(command)
-//        result.size shouldBe 1
-//    }
-//
-//    "find Users with property and link exists queries" {
-//        val command = "find User { supervises => _ }"
-//        val result = stroll.run(command)
-//        result.size shouldBe 1
-//
-//        val command1 = "find User { supervises -> _ }"
-//        val result1 = stroll.run(command1)
-//        result1.size shouldBe 1
-//
-//        val command2 = "find User { username: _ }"
-//        val result2 = stroll.run(command2)
-//        result2.size shouldBe 1
-//    }
+    "find that all DeleteTest entites have been deleted" {
+        val command = "find DeleteTest {}"
+        val result = stroll.run(command)
+        result.getAsJsonPrimitive("operation").asString shouldBe "find"
+        result.getAsJsonArray("results").size() shouldBe 0
+    }
+    "find all Users" {
+        val command = "find User {}"
+        val result = stroll.run(command)
+        result.getAsJsonPrimitive("operation").asString shouldBe "find"
+        result.getAsJsonArray("results").size() shouldBe 5
+    }
+    "find User based on properties" {
+        val command = "find User { age: 24 }"
+        val result = stroll.run(command)
+        result.getAsJsonPrimitive("operation").asString shouldBe "find"
+        result.getAsJsonArray("results").size() shouldBe 1
+
+        val command2 = "find User { name: \"Bill\", age: 45 }"
+        val result2 = stroll.run(command2)
+        result2.getAsJsonPrimitive("operation").asString shouldBe "find"
+        result2.getAsJsonArray("results").size() shouldBe 1
+    }
+
+    "find User based on link" {
+        val command = "find User { contact -> 0-2, name: \"Margret\" }"
+        val result = stroll.run(command)
+        result.getAsJsonPrimitive("operation").asString shouldBe "find"
+        result.getAsJsonArray("results").size() shouldBe 1
+    }
+
+    "find User based on links" {
+        val command = "find User { supervises => [ 0-1, 0-3 ] }"
+        val result = stroll.run(command)
+        result.getAsJsonPrimitive("operation").asString shouldBe "find"
+        result.getAsJsonArray("results").size() shouldBe 1
+    }
+
+    "find Users with property and link exists queries" {
+        val command = "find User { supervises => _ }"
+        val result = stroll.run(command)
+        result.getAsJsonPrimitive("operation").asString shouldBe "find"
+        result.getAsJsonArray("results").size() shouldBe 1
+
+        val command1 = "find User { supervises -> _ }"
+        val result1 = stroll.run(command1)
+        result1.getAsJsonPrimitive("operation").asString shouldBe "find"
+        result1.getAsJsonArray("results").size() shouldBe 1
+
+
+        val command2 = "find User { username: _ }"
+        val result2 = stroll.run(command2)
+        result2.getAsJsonPrimitive("operation").asString shouldBe "find"
+        result2.getAsJsonArray("results").size() shouldBe 1
+    }
 
 //    "find within a range using to" {
 //        val command = "find User { age: 40 to 49 }"
