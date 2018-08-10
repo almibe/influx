@@ -20,6 +20,8 @@ dependencies {
     compile 'org.jetbrains.kotlin:kotlin-stdlib:1.2.51'
     compile 'org.jetbrains.xodus:xodus-entity-store:1.2.3'
     compile 'com.google.code.gson:gson:2.8.5'
+    compile 'org.almibe:stroll-grammar:0.1.0-SNAPSHOT'
+    testCompile 'org.antlr:antlr4:4.7'
     testCompile 'io.kotlintest:kotlintest-runner-junit5:3.1.7'
 }
 

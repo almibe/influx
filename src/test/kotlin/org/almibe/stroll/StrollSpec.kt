@@ -169,6 +169,18 @@ class StrollSpec : StringSpec({
         result2.getAsJsonArray("results").size() shouldBe 1
     }
 
+    "new and find with namespaced id" {
+        val command = "new test.space.User { username:\"Juniper\" }"
+        val result = stroll.run(command)
+        result.getAsJsonPrimitive("operation").asString shouldBe "new"
+        result.getAsJsonObject("result").getAsJsonPrimitive("entityId").asString shouldBe "3-0"
+
+        val findCommand = ""
+        val findResult = stroll.run(command)
+    }
+
+
+
 //    "find within a range using to" {
 //        val command = "find User { age: 40 to 49 }"
 //        val result = stroll.run(command)
