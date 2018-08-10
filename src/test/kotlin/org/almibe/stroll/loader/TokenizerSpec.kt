@@ -17,9 +17,8 @@ specific language governing permissions and limitations
 under the License.
 */
 
-package org.almibe.stroll.tokenizer
+package org.almibe.stroll.loader
 
-import io.kotlintest.shouldBe
 import io.kotlintest.specs.StringSpec
 
 class TokenizerSpec : StringSpec({

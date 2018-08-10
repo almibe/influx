@@ -17,8 +17,11 @@ specific language governing permissions and limitations
 under the License.
 */
 
-package org.almibe.stroll.tokenizer
+package org.almibe.stroll.loader
 
+import org.almibe.stroll.CommandType
+
+@Deprecated("Delete after antlr rewrite")
 enum class TokenType {
     STRING, //character string in double quotes
     INT, //any fixed point number that doesn't end with L
@@ -38,3 +41,17 @@ enum class TokenType {
 }
 
 data class StrollToken(val tokenType: TokenType, val tokenContent: String)
+
+data class CommandArguments (
+        var commandType: CommandType? = null,
+        var entityName: String = "",
+        //three collections used by all commands
+        val properties: MutableMap<String, StrollToken> = mutableMapOf(),
+        val link: MutableMap<String, StrollToken> = mutableMapOf(),
+        val links: MutableList<Pair<String, StrollToken>> = mutableListOf(),
+        //collections only used by find
+        val propertyExistsCheck: MutableList<String> = mutableListOf(),
+        val linkExistsCheck: MutableList<String> = mutableListOf()
+        //TODO eventually this will contain range and startsWith info
+)
+
