@@ -47,46 +47,20 @@ class StrollCommandRunner {
     }
 
     private fun handleUpdate(entityStore: PersistentEntityStore, commandArguments: CommandArguments): UpdateResult {
-        TODO()
-        //        val itr: Iterator<StrollToken> = tokenize(commandString)
-//        val update = itr.next()
-//        assert(update.tokenType == TokenType.KEYWORD && update.tokenContent == "update")
-//        val entityId: String = itr.next().tokenContent
-//
-//        val commandArguments = readCommandArguments(itr) ?: throw RuntimeException()
-//
-//        return entityStore.computeInTransaction { transaction ->
-//            val entity = transaction.getEntity(transaction.toEntityId(entityId))
-//            setPropertiesAndLinks(transaction, entity, commandArguments)
-//            val result = JsonObject()
-//            result.addProperty("operation", "update")
-//            entityToJsonObject(entity)
-//            result.add("result", entityToJsonObject(entity))
-//            result
-//        }
-
+        return entityStore.computeInTransaction { transaction ->
+            val entity = transaction.getEntity(transaction.toEntityId(commandArguments.entityId))
+            setPropertiesAndLinks(transaction, entity, commandArguments)
+            UpdateResult(entityToReadEntity(entity))
+        }
     }
 
     private fun handleSet(entityStore: PersistentEntityStore, commandArguments: CommandArguments): SetResult {
-        TODO()
-        //        val itr: Iterator<StrollToken> = tokenize(commandString)
-//        val set = itr.next()
-//        assert(set.tokenType == TokenType.KEYWORD && set.tokenContent == "set")
-//        val entityId: String = itr.next().tokenContent
-//
-//        val commandArguments = readCommandArguments(itr) ?: throw RuntimeException()
-//
-//        return entityStore.computeInTransaction { transaction ->
-//            val entity = transaction.getEntity(transaction.toEntityId(entityId))
-//            clearPropertiesAndLinks(entity)
-//            setPropertiesAndLinks(transaction, entity, commandArguments)
-//            val result = JsonObject()
-//            result.addProperty("operation", "set")
-//            entityToJsonObject(entity)
-//            result.add("result", entityToJsonObject(entity))
-//            result
-//        }
-
+        return entityStore.computeInTransaction { transaction ->
+            val entity = transaction.getEntity(transaction.toEntityId(commandArguments.entityId))
+            clearPropertiesAndLinks(entity)
+            setPropertiesAndLinks(transaction, entity, commandArguments)
+            SetResult(entityToReadEntity(entity))
+        }
     }
 
     private fun handleDelete(entityStore: PersistentEntityStore, commandArguments: CommandArguments): DeleteResult {

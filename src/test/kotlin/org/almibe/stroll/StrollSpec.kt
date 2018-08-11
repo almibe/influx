@@ -78,40 +78,53 @@ class StrollSpec : StringSpec({
         )
         result shouldBe NewResult(entity)
     }
-//
-//    "five major types" {
-//        val command = "new TypeTest { int: 3, long: 1009L, double: 3.14, string: \"Test\", boolean: true }"
-//        val result = stroll.run(command)
-//        result.getAsJsonPrimitive("operation").asString shouldBe "new"
-//        result.getAsJsonObject("result").getAsJsonPrimitive("entityId").asString shouldBe "1-0"
-//        val txnResult = entityStore.computeInReadonlyTransaction { txn ->
-//            txn.find("TypeTest", "char", 'a').size() +
-//            txn.find("TypeTest", "int", 3).size() +
-//            txn.find("TypeTest", "long", 1009L).size() +
-//            txn.find("TypeTest", "double", 3.14).size() +
-//            txn.find("TypeTest", "string", "Test").size() +
-//            txn.find("TypeTest", "boolean", true).size() +
-//            //below should return 0
-//            txn.find("TypeTest", "boolean", "true").size() +
-//            txn.find("TypeTest", "double", 3.14f).size()
-//        }
-//        txnResult shouldBe 5
-//    }
-//
-//    "update by adding age and extra user link" {
-//        val command = "update 0-4 { age: 45, supervises => [ 0-1 ], supervises => 0-0 }"
-//        val result = stroll.run(command)
-//        result.getAsJsonPrimitive("operation").asString shouldBe "update"
-//        result.getAsJsonObject("result").getAsJsonPrimitive("entityId").asString shouldBe "0-4"
-//    }
-//
-//    "set data for 0-1" {
-//        val command = "set 0-1 { age:24, name: \"Lil\" }"
-//        val result = stroll.run(command)
-//        result.getAsJsonPrimitive("operation").asString shouldBe "set"
-//        result.getAsJsonObject("result").getAsJsonPrimitive("entityId").asString shouldBe "0-1"
-//    }
-//
+
+    "five major types" {
+        val command = "new TypeTest { int: 3, long: 1009L, double: 3.14, string: \"Test\", boolean: true }"
+        val result = stroll.run(command)
+        result.commandType shouldBe CommandType.NEW
+        val txnResult = entityStore.computeInReadonlyTransaction { txn ->
+            txn.find("TypeTest", "char", 'a').size() +
+            txn.find("TypeTest", "int", 3).size() +
+            txn.find("TypeTest", "long", 1009L).size() +
+            txn.find("TypeTest", "double", 3.14).size() +
+            txn.find("TypeTest", "string", "Test").size() +
+            txn.find("TypeTest", "boolean", true).size() +
+            //below should return 0
+            txn.find("TypeTest", "boolean", "true").size() +
+            txn.find("TypeTest", "double", 3.14f).size()
+        }
+        txnResult shouldBe 5
+    }
+
+    "update by adding age and extra user link" {
+        val command = "update 0-4 { age: 45, supervises => [ 0-1 ], supervises => 0-0 }"
+        val result = stroll.run(command)
+
+        val entity = ReadEntity("User", "0-4",
+            setOf(ReadProperty("name", "String", "Bill"),
+                    ReadProperty("age", "Int", "45")),
+            setOf(ReadLink("supervises", "0-0"),
+                    ReadLink("supervises", "0-1"),
+                    ReadLink("supervises", "0-2"),
+                    ReadLink("supervises", "0-3"))
+        )
+        result shouldBe UpdateResult(entity)
+    }
+
+    "set data for 0-1" {
+        val command = "set 0-1 { age:24, name: \"Lil\" }"
+        val result = stroll.run(command)
+
+        val entity = ReadEntity("User", "0-1",
+                setOf(ReadProperty("age", "Int", "24"),
+                        ReadProperty("name", "String", "Lil")
+                ),
+                setOf()
+        )
+        result shouldBe SetResult(entity)
+    }
+
 //    "delete single entity" {
 //        stroll.run("new DeleteTest { }")
 //        val command = "delete 2-0"
