@@ -206,33 +206,27 @@ class StrollCommandRunner {
     }
 
     private fun entityToReadEntity(entity: Entity): ReadEntity {
-        TODO()
-//        val properties = entity.propertyNames.map { propertyName ->
-//            Pair(propertyName, entity.getProperty(propertyName).toString())
-//        }
-//        val links = entity.linkNames
-//
-//        val result = JsonObject()
-//        val jsonArrayProperties = JsonArray()
-//        val jsonArrayLinks = JsonArray()
-//
-//        properties.forEach {
-//            val property = JsonObject()
-//            property.addProperty(it.first, it.second)
-//            jsonArrayProperties.add(property)
-//        }
-//
-//        links.forEach {
-//            jsonArrayLinks.add(it)
-//        }
-//
-//        result.addProperty("entityType", entity.type)
-//        result.addProperty("entityId", entity.toIdString())
-//
-//        result.add("properties", jsonArrayProperties)
-//        result.add("links", jsonArrayLinks)
-//
-//        return result
+        val properties: List<ReadProperty> = entity.propertyNames.map { propertyName: String ->
+            val property = entity.getProperty(propertyName)
+            ReadProperty(propertyName, getPropertyType(property!!), property.toString())
+        }
+        val links = mutableListOf<ReadLink>()
+        entity.linkNames.forEach { linkName: String ->
+            entity.getLinks(linkName).forEach { linkedEntity: Entity ->
+                links.add(ReadLink(linkName, linkedEntity.toIdString()))
+            }
+        }
+
+        return ReadEntity(entity.type, entity.toIdString(), properties, links)
+    }
+
+    private fun getPropertyType(property: Any): String = when (property) {
+        is String -> "String"
+        is Int -> "Int"
+        is Double -> "Double"
+        is Long -> "Long"
+        is Boolean -> "Boolean"
+        else -> property.javaClass.canonicalName
     }
 
     private fun setPropertiesAndLinks(transaction: StoreTransaction, entity: Entity, commandArguments: CommandArguments) {
