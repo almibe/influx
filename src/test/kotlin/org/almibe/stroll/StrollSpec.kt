@@ -32,37 +32,52 @@ class StrollSpec : StringSpec({
     "new with no properties" {
         val command = "new User {}"
         val result = stroll.run(command)
-        val entity = ReadEntity("User", "0-0", listOf(), listOf())
+        val entity = ReadEntity("User", "0-0", setOf(), setOf())
         result shouldBe NewResult(entity)
     }
 
-//    "new with single property" {
-//        val command = "new User { age: 54 }"
-//        val result = stroll.run(command)
-//        result.getAsJsonPrimitive("operation").asString shouldBe "new"
-//        result.getAsJsonObject("result").getAsJsonPrimitive("entityId").asString shouldBe "0-1"
-//    }
-//
-//    "new with multiple properties" {
-//        val command = "new User { name: \"Bob\", username: \"bob\", age: 54 }"
-//        val result = stroll.run(command)
-//        result.getAsJsonPrimitive("operation").asString shouldBe "new"
-//        result.getAsJsonObject("result").getAsJsonPrimitive("entityId").asString shouldBe "0-2"
-//    }
-//
-//    "new with single link" {
-//        val command = "new User { name: \"Margret\", contact -> 0-2 }"
-//        val result = stroll.run(command)
-//        result.getAsJsonPrimitive("operation").asString shouldBe "new"
-//        result.getAsJsonObject("result").getAsJsonPrimitive("entityId").asString shouldBe "0-3"
-//    }
-//
-//    "new with multiple links" {
-//        val command = "new User { name: \"Bill\", supervises => [ 0-3, 0-2 ] }"
-//        val result = stroll.run(command)
-//        result.getAsJsonPrimitive("operation").asString shouldBe "new"
-//        result.getAsJsonObject("result").getAsJsonPrimitive("entityId").asString shouldBe "0-4"
-//    }
+    "new with single property" {
+        val command = "new User { age: 54 }"
+        val result = stroll.run(command)
+        val entity = ReadEntity("User", "0-1", setOf(ReadProperty("age", "Int", "54")), setOf())
+        result shouldBe NewResult(entity)
+    }
+
+    "new with multiple properties" {
+        val command = "new User { name: \"Bob\", username: \"bob\", age: 54 }"
+        val result = stroll.run(command)
+        val entity = ReadEntity("User", "0-2",
+                setOf(
+                        ReadProperty("age", "Int", "54"),
+                        ReadProperty("username", "String", "bob"),
+                        ReadProperty("name", "String", "Bob")),
+                setOf())
+        result shouldBe NewResult(entity)
+    }
+
+    "new with single link" {
+        val command = "new User { name: \"Margret\", contact -> 0-2 }"
+        val result = stroll.run(command)
+
+        val entity = ReadEntity("User", "0-3",
+                setOf(ReadProperty("name", "String", "Margret")),
+                setOf(ReadLink("contact", "0-2")))
+        result shouldBe NewResult(entity)
+    }
+
+    "new with multiple links" {
+        val command = "new User { name: \"Bill\", supervises => [ 0-3, 0-2 ] }"
+        val result = stroll.run(command)
+
+        val entity = ReadEntity("User", "0-4",
+                setOf(ReadProperty("name", "String", "Bill")),
+                setOf(
+                        ReadLink("supervises", "0-3"),
+                        ReadLink("supervises", "0-2")
+                )
+        )
+        result shouldBe NewResult(entity)
+    }
 //
 //    "five major types" {
 //        val command = "new TypeTest { int: 3, long: 1009L, double: 3.14, string: \"Test\", boolean: true }"

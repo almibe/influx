@@ -206,11 +206,11 @@ class StrollCommandRunner {
     }
 
     private fun entityToReadEntity(entity: Entity): ReadEntity {
-        val properties: List<ReadProperty> = entity.propertyNames.map { propertyName: String ->
+        val properties: Set<ReadProperty> = entity.propertyNames.map { propertyName: String ->
             val property = entity.getProperty(propertyName)
             ReadProperty(propertyName, getPropertyType(property!!), property.toString())
-        }
-        val links = mutableListOf<ReadLink>()
+        }.toSet()
+        val links = mutableSetOf<ReadLink>()
         entity.linkNames.forEach { linkName: String ->
             entity.getLinks(linkName).forEach { linkedEntity: Entity ->
                 links.add(ReadLink(linkName, linkedEntity.toIdString()))

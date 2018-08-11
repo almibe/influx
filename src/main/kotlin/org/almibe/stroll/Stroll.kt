@@ -35,7 +35,7 @@ enum class CommandType {
 data class ReadProperty(val propertyName: String, val propertyType: String, val stringValue: String)
 data class ReadLink(val linkName: String, val entityId: String)
 data class ReadEntity(val entityType: String, val entityId: String,
-                      val properties: List<ReadProperty>, val links: List<ReadLink>)
+                      val properties: Set<ReadProperty>, val links: Set<ReadLink>)
 
 sealed class StrollResult(val commandType: CommandType)
 data class NewResult(val newEntity: ReadEntity): StrollResult(CommandType.NEW)
