@@ -33,7 +33,10 @@ import org.antlr.v4.runtime.tree.TerminalNode
 data class Property(val type: String, val value: String)
 data class CommandArguments (
         var commandType: CommandType? = null,
-        var entityName: String = "",
+        var entityType: String = "", //used by new
+        var entityId: String = "", //used by set update
+        val entityIds: MutableList<String> = mutableListOf(), //used by delete
+        var commandName: String = "", //used by simple command
         //three collections used by all commands
         val properties: MutableMap<String, Property> = mutableMapOf(),
         val link: MutableMap<String, String> = mutableMapOf(),
@@ -61,7 +64,24 @@ class StrollCommandListener : StrollListener {
 
     override fun exitNewCommand(context: Stroll.NewCommandContext) {
         currentCommand.commandType = CommandType.NEW
-        currentCommand.entityName = context.NAME().text
+        currentCommand.entityType = context.NAME().text
+    }
+
+    override fun exitUpdateCommand(context: Stroll.UpdateCommandContext) {
+        currentCommand.commandType = CommandType.UPDATE
+        currentCommand.entityId = context.IDENTITY().text
+    }
+
+    override fun exitSetCommand(context: Stroll.SetCommandContext) {
+        currentCommand.commandType = CommandType.SET
+        currentCommand.entityId = context.IDENTITY().text
+    }
+
+    override fun exitDeleteCommand(context: Stroll.DeleteCommandContext) {
+        currentCommand.commandType = CommandType.DELETE
+        context.IDENTITY().forEach { node ->
+            currentCommand.entityIds.add(node.text)
+        }
     }
 
     override fun exitPropertyAssignment(context: Stroll.PropertyAssignmentContext) {
@@ -88,7 +108,7 @@ class StrollCommandListener : StrollListener {
     private fun getValue(context: Stroll.PropertyValueContext): String = when {
         context.BOOLEAN() != null -> context.text
         context.STRING() != null -> context.text.substring(1, context.text.length-1)
-        context.LONG() != null -> "${context.text}L"
+        context.LONG() != null -> context.text
         context.DOUBLE() != null -> context.text
         context.INT() != null -> context.text
         else -> context.text
@@ -116,19 +136,12 @@ class StrollCommandListener : StrollListener {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    override fun exitUpdateCommand(p0: Stroll.UpdateCommandContext?) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
 
     override fun exitSimpleCommand(p0: Stroll.SimpleCommandContext?) {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
     override fun exitPropertyStartsWith(p0: Stroll.PropertyStartsWithContext?) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-    override fun exitSetCommand(p0: Stroll.SetCommandContext?) {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
@@ -145,10 +158,6 @@ class StrollCommandListener : StrollListener {
     }
 
     override fun exitFindParameter(p0: Stroll.FindParameterContext?) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-    override fun exitDeleteCommand(p0: Stroll.DeleteCommandContext?) {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
