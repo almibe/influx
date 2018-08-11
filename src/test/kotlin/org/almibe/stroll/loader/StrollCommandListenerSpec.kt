@@ -90,4 +90,10 @@ class StrollCommandListenerSpec : StringSpec({
         val result = readCommand(command)
         TODO()
     }
+
+    "simple command test" {
+        val command = "list"
+        val result = readCommand(command)
+        TODO()
+    }
 })

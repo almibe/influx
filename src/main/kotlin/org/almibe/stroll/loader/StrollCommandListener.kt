@@ -104,6 +104,14 @@ class StrollCommandListener : StrollListener {
         }
     }
 
+    override fun exitLinksListAssigment(context: Stroll.LinksListAssigmentContext) {
+        val name = context.NAME().text
+        val linkTo = context.IDENTITY().map { node ->
+            Pair(name, node.text)
+        }
+        currentCommand.links.addAll(linkTo)
+    }
+
     override fun exitFindCommand(p0: Stroll.FindCommandContext?) {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
@@ -152,6 +160,7 @@ class StrollCommandListener : StrollListener {
         throw RuntimeException("In error node. $node")
     }
 
+    override fun enterLinksListAssigment(p0: Stroll.LinksListAssigmentContext?) {}
     override fun exitCommand(p0: Stroll.CommandContext?) {}
     override fun enterSetCommand(p0: Stroll.SetCommandContext?) {}
     override fun enterPropertyAssignment(p0: Stroll.PropertyAssignmentContext?) {}
