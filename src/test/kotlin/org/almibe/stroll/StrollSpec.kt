@@ -25,7 +25,7 @@ import jetbrains.exodus.entitystore.PersistentEntityStores
 import java.nio.file.Files
 
 class StrollSpec : StringSpec({
-    val entityStore: PersistentEntityStore = PersistentEntityStores.newInstance(Files.createTempDirectory("tmp").toFile())!!
+    val entityStore: PersistentEntityStore = PersistentEntityStores.newInstance(Files.createTempDirectory("tmp").toFile())
     val stroll = Stroll(entityStore)
 
 //    "new with no properties" {
