@@ -125,22 +125,23 @@ class StrollSpec : StringSpec({
         result shouldBe SetResult(entity)
     }
 
-//    "delete single entity" {
-//        stroll.run("new DeleteTest { }")
-//        val command = "delete 2-0"
-//        val result = stroll.run(command)
-//        result.getAsJsonPrimitive("operation").asString shouldBe "delete"
-//        result.getAsJsonPrimitive("total").asString shouldBe "1"
-//    }
-//    "delete list of entities" {
-//        stroll.run("new DeleteTest { test: 345}")
-//        stroll.run("new DeleteTest { blah: \"Stuff\"}")
-//        val command = "delete [2-1, 2-2]"
-//        val result = stroll.run(command)
-//        result.getAsJsonPrimitive("operation").asString shouldBe "delete"
-//        result.getAsJsonPrimitive("total").asString shouldBe "2"
-//    }
-//
+    "delete single entity" {
+        stroll.run("new DeleteTest { }")
+        val command = "delete 2-0"
+        val result = stroll.run(command)
+
+        result shouldBe DeleteResult(1)
+    }
+
+    "delete list of entities" {
+        stroll.run("new DeleteTest { test: 345}")
+        stroll.run("new DeleteTest { blah: \"Stuff\"}")
+        val command = "delete [2-1, 2-2]"
+        val result = stroll.run(command)
+
+        result shouldBe DeleteResult(2)
+    }
+
 //    "find that all DeleteTest entites have been deleted" {
 //        val command = "find DeleteTest {}"
 //        val result = stroll.run(command)

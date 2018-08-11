@@ -64,42 +64,15 @@ class StrollCommandRunner {
     }
 
     private fun handleDelete(entityStore: PersistentEntityStore, commandArguments: CommandArguments): DeleteResult {
-        TODO()
-        //        val itr: Iterator<StrollToken> = tokenize(commandString)
-//        val delete = itr.next()
-//        assert(delete.tokenType == TokenType.KEYWORD && delete.tokenContent == "delete")
-//        val startBracketOrIdentity = itr.next()
-//
-//        return entityStore.computeInTransaction { transaction ->
-//            var total = 0
-//            when (startBracketOrIdentity.tokenType) {
-//                TokenType.START_BRACKET -> {
-//                    var next = itr.next()
-//                    while (next.tokenType == TokenType.IDENTITY) {
-//                        val entity = transaction.getEntity(transaction.toEntityId(next.tokenContent))
-//                        entity.delete()
-//                        total++
-//
-//                        next = itr.next()
-//                        if (next.tokenType == TokenType.COMMA) {
-//                            next = itr.next()
-//                        }
-//                    }
-//                    assert(next.tokenType == TokenType.END_BRACKET)
-//                }
-//                TokenType.IDENTITY -> {
-//                    val entity = transaction.getEntity(transaction.toEntityId(startBracketOrIdentity.tokenContent))
-//                    entity.delete()
-//                    total++
-//                }
-//                else -> throw RuntimeException("Unexpected argument passed to delete $startBracketOrIdentity")
-//            }
-//            val result = JsonObject()
-//            result.addProperty("operation", "delete")
-//            result.addProperty("total", total)
-//            result
-//        }
-
+        return entityStore.computeInTransaction { transaction ->
+            var total = 0
+            commandArguments.entityIds.forEach { entityId: String ->
+                val entity = transaction.getEntity(transaction.toEntityId(entityId))
+                entity.delete()
+                total++
+            }
+            DeleteResult(total)
+        }
     }
 
     private fun handleFind(entityStore: PersistentEntityStore, commandArguments: CommandArguments): FindResult {
