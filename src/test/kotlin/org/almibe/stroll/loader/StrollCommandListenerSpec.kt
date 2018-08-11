@@ -103,7 +103,7 @@ class StrollCommandListenerSpec : StringSpec({
         val command = "find User { supervises => [ 0-1, 0-3 ] }"
         val result = readCommand(command)
 
-        val commandArguments = CommandArguments(commandType = CommandType.FIND)
+        val commandArguments = CommandArguments(commandType = CommandType.FIND, entityType = "User")
         commandArguments.links.add(Pair("supervises", "0-1"))
         commandArguments.links.add(Pair("supervises", "0-3"))
 
@@ -114,20 +114,20 @@ class StrollCommandListenerSpec : StringSpec({
         val command = "find User { supervises => _ }"
         val result = readCommand(command)
 
-        val commandArguments = CommandArguments(commandType = CommandType.FIND)
+        val commandArguments = CommandArguments(commandType = CommandType.FIND, entityType = "User")
         commandArguments.linkExistsCheck.add("supervises")
         result shouldBe commandArguments
 
         val command1 = "find User { supervises -> _ }"
         val result1 = readCommand(command1)
-        val commandArguments1 = CommandArguments(commandType = CommandType.FIND)
+        val commandArguments1 = CommandArguments(commandType = CommandType.FIND, entityType = "User")
         commandArguments1.linkExistsCheck.add("supervises")
         result1 shouldBe commandArguments1
 
 
         val command2 = "find User { username: _ }"
         val result2 = readCommand(command2)
-        val commandArguments2 = CommandArguments(commandType = CommandType.FIND)
+        val commandArguments2 = CommandArguments(commandType = CommandType.FIND, entityType = "User")
         commandArguments2.propertyExistsCheck.add("username")
         result2 shouldBe commandArguments2
     }

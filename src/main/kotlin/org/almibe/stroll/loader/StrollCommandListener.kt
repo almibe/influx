@@ -84,6 +84,16 @@ class StrollCommandListener : StrollListener {
         }
     }
 
+    override fun exitFindCommand(context: Stroll.FindCommandContext) {
+        currentCommand.commandType = CommandType.FIND
+        currentCommand.entityType = context.NAME().text
+    }
+
+    override fun exitSimpleCommand(context: Stroll.SimpleCommandContext) {
+        currentCommand.commandType = CommandType.SIMPLE
+        currentCommand.commandName = context.NAME().text
+    }
+
     override fun exitPropertyAssignment(context: Stroll.PropertyAssignmentContext) {
         val name = context.NAME().text
         val property = createProperty(context.propertyValue())
@@ -132,36 +142,19 @@ class StrollCommandListener : StrollListener {
         currentCommand.links.addAll(linkTo)
     }
 
-    override fun exitFindCommand(p0: Stroll.FindCommandContext?) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    override fun exitLinkExists(context: Stroll.LinkExistsContext) {
+        currentCommand.linkExistsCheck.add(context.NAME().text)
     }
 
-
-    override fun exitSimpleCommand(p0: Stroll.SimpleCommandContext?) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    override fun exitPropertyExists(context: Stroll.PropertyExistsContext) {
+        currentCommand.propertyExistsCheck.add(context.NAME().text)
     }
 
     override fun exitPropertyStartsWith(p0: Stroll.PropertyStartsWithContext?) {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    override fun exitLinkExists(p0: Stroll.LinkExistsContext?) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-    override fun exitPropertyValue(p0: Stroll.PropertyValueContext?) {
-
-    }
-
     override fun exitPropertyRange(p0: Stroll.PropertyRangeContext?) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-    override fun exitFindParameter(p0: Stroll.FindParameterContext?) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-    override fun exitPropertyExists(p0: Stroll.PropertyExistsContext?) {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
@@ -169,6 +162,8 @@ class StrollCommandListener : StrollListener {
         throw RuntimeException("In error node. $node")
     }
 
+    override fun exitPropertyValue(p0: Stroll.PropertyValueContext?) {}
+    override fun exitFindParameter(context: Stroll.FindParameterContext) {}
     override fun enterLinksListAssigment(p0: Stroll.LinksListAssigmentContext?) {}
     override fun exitCommand(p0: Stroll.CommandContext?) {}
     override fun enterSetCommand(p0: Stroll.SetCommandContext?) {}
