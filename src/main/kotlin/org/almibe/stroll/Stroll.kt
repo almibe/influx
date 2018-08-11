@@ -20,13 +20,7 @@ under the License.
 package org.almibe.stroll
 
 import jetbrains.exodus.entitystore.EntityStore
-import org.almibe.stroll.loader.CommandArguments
-import org.almibe.stroll.loader.StrollCommandListener
-import org.almibe.stroll.parser.ModalStrollLexer
-import org.almibe.stroll.parser.Stroll
-import org.antlr.v4.runtime.CharStreams
-import org.antlr.v4.runtime.CommonTokenStream
-import org.antlr.v4.runtime.tree.ParseTreeWalker
+import org.almibe.stroll.loader.readCommand
 
 enum class CommandType {
     NEW,
@@ -54,17 +48,5 @@ class Stroll(entityStore: EntityStore) {
     fun run(command: String): StrollResult {
         val commandArguments = readCommand(command)
         TODO()
-    }
-
-    fun readCommand(command: String): CommandArguments {
-        val stream = CharStreams.fromString(command)
-        val lexer = ModalStrollLexer(stream)
-        val tokens = CommonTokenStream(lexer)
-        val parser = Stroll(tokens)
-        val walker = ParseTreeWalker()
-        val listener = StrollCommandListener()
-        walker.walk(listener, parser.command())
-        parser.command()
-        return listener.model
     }
 }

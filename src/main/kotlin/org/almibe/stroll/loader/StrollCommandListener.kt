@@ -21,6 +21,37 @@ package org.almibe.stroll.loader
 
 import org.almibe.stroll.parser.Stroll
 import org.almibe.stroll.parser.StrollBaseListener
+import org.almibe.stroll.CommandType
+import org.almibe.stroll.parser.ModalStrollLexer
+import org.antlr.v4.runtime.CharStreams
+import org.antlr.v4.runtime.CommonTokenStream
+import org.antlr.v4.runtime.tree.ParseTreeWalker
+
+data class CommandArguments (
+        var commandType: CommandType? = null,
+        var entityName: String = "",
+        //three collections used by all commands
+        val properties: MutableMap<String, StrollToken> = mutableMapOf(),
+        val link: MutableMap<String, StrollToken> = mutableMapOf(),
+        val links: MutableList<Pair<String, StrollToken>> = mutableListOf(),
+        //collections only used by find
+        val propertyExistsCheck: MutableList<String> = mutableListOf(),
+        val linkExistsCheck: MutableList<String> = mutableListOf()
+        //TODO eventually this will contain range and startsWith info
+)
+
+fun readCommand(command: String): CommandArguments {
+    val stream = CharStreams.fromString(command)
+    val lexer = ModalStrollLexer(stream)
+    val tokens = CommonTokenStream(lexer)
+    val parser = Stroll(tokens)
+    val walker = ParseTreeWalker()
+    val listener = StrollCommandListener()
+    walker.walk(listener, parser.command())
+    parser.command()
+    return listener.model
+}
+
 
 class StrollCommandListener : StrollBaseListener() {
     val model = CommandArguments()
