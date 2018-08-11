@@ -19,7 +19,7 @@ under the License.
 
 package org.almibe.stroll
 
-import jetbrains.exodus.entitystore.EntityStore
+import jetbrains.exodus.entitystore.PersistentEntityStore
 import org.almibe.stroll.loader.readCommand
 import org.almibe.stroll.runner.StrollCommandRunner
 
@@ -45,11 +45,11 @@ data class DeleteResult(val totalDeleted: Int): StrollResult(CommandType.DELETE)
 data class FindResult(val entities: List<ReadEntity>): StrollResult(CommandType.FIND)
 data class SimpleResult(val commandName: String, val result: String): StrollResult(CommandType.SIMPLE)
 
-class Stroll(entityStore: EntityStore) {
+class Stroll(val entityStore: PersistentEntityStore) {
     private val commandRunner = StrollCommandRunner()
 
     fun run(command: String): StrollResult {
         val commandArguments = readCommand(command)
-        return commandRunner.runCommandArguments(commandArguments)
+        return commandRunner.runCommandArguments(entityStore, commandArguments)
     }
 }

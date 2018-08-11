@@ -19,68 +19,36 @@ under the License.
 
 package org.almibe.stroll.runner
 
-import org.almibe.stroll.StrollResult
+import jetbrains.exodus.entitystore.Entity
+import jetbrains.exodus.entitystore.PersistentEntityStore
+import jetbrains.exodus.entitystore.StoreTransaction
+import org.almibe.stroll.*
 import org.almibe.stroll.loader.CommandArguments
 
 class StrollCommandRunner {
-    fun runCommandArguments(commandArguments: CommandArguments): StrollResult {
-        TODO()
+    fun runCommandArguments(entityStore: PersistentEntityStore, commandArguments: CommandArguments): StrollResult {
+        return when (commandArguments.commandType) {
+            CommandType.NEW -> handleNew(entityStore, commandArguments)
+            CommandType.UPDATE -> handleUpdate(entityStore, commandArguments)
+            CommandType.SET -> handleSet(entityStore, commandArguments)
+            CommandType.DELETE -> handleDelete(entityStore, commandArguments)
+            CommandType.FIND -> handleFind(entityStore, commandArguments)
+            CommandType.SIMPLE -> handleSimple(entityStore, commandArguments)
+            else -> throw RuntimeException("Unexpected command type ${commandArguments.commandType}")
+        }
     }
 
+    private fun handleNew(entityStore: PersistentEntityStore, commandArguments: CommandArguments): NewResult {
+        return entityStore.computeInTransaction { transaction ->
+            val entity = transaction.newEntity(commandArguments.entityType)
+            setPropertiesAndLinks(transaction, entity, commandArguments)
+            NewResult(entityToReadEntity(entity))
+        }
+    }
 
-//    private fun clearPropertiesAndLinks(entity: Entity) {
-//        entity.propertyNames.forEach {
-//            entity.deleteProperty(it)
-//        }
-//        entity.linkNames.forEach {
-//            entity.deleteLinks(it)
-//        }
-//    }
-//
-//    private fun setPropertiesAndLinks(transaction: StoreTransaction, entity: Entity, commandArguments: CommandArguments) {
-//        commandArguments.properties.forEach { property ->
-//            when (property.value.tokenType) {
-//                TokenType.DOUBLE -> entity.setProperty(property.key, property.value.tokenContent.toDouble())
-//                TokenType.LONG -> entity.setProperty(property.key, property.value.tokenContent.trim('L').toLong())
-//                TokenType.INT -> entity.setProperty(property.key, property.value.tokenContent.toInt())
-//                TokenType.STRING -> entity.setProperty(property.key, property.value.tokenContent)
-//                TokenType.KEYWORD -> entity.setProperty(property.key, property.value.tokenContent.toBoolean())
-//                else -> {
-//                    throw RuntimeException("Property type must be string, char, boolean, int, long or double.")
-//                }
-//            }
-//        }
-//        commandArguments.link.forEach {
-//            val linkedEntity = transaction.getEntity(transaction.toEntityId(it.value.tokenContent))
-//            entity.setLink(it.key, linkedEntity)
-//        }
-//        commandArguments.links.forEach {
-//            val linkedEntity = transaction.getEntity(transaction.toEntityId(it.second.tokenContent))
-//            entity.addLink(it.first, linkedEntity)
-//        }
-//    }
-//
-//    private fun runNew(commandString: String): JsonObject {
-//        val itr: Iterator<StrollToken> = tokenize(commandString)
-//        val new = itr.next()
-//        assert(new.tokenType == TokenType.KEYWORD && new.tokenContent == "new")
-//        val entityType: String = itr.next().tokenContent
-//
-//        val commandArguments = readCommandArguments(itr) ?: throw RuntimeException()
-//
-//        return entityStore.computeInTransaction { transaction ->
-//            val entity = transaction.newEntity(entityType)
-//            setPropertiesAndLinks(transaction, entity, commandArguments)
-//            val result = JsonObject()
-//            result.addProperty("operation", "new")
-//            entityToJsonObject(entity)
-//            result.add("result", entityToJsonObject(entity))
-//            result
-//        }
-//    }
-//
-//    private fun runUpdate(commandString: String): JsonObject {
-//        val itr: Iterator<StrollToken> = tokenize(commandString)
+    private fun handleUpdate(entityStore: PersistentEntityStore, commandArguments: CommandArguments): UpdateResult {
+        TODO()
+        //        val itr: Iterator<StrollToken> = tokenize(commandString)
 //        val update = itr.next()
 //        assert(update.tokenType == TokenType.KEYWORD && update.tokenContent == "update")
 //        val entityId: String = itr.next().tokenContent
@@ -96,10 +64,12 @@ class StrollCommandRunner {
 //            result.add("result", entityToJsonObject(entity))
 //            result
 //        }
-//    }
-//
-//    private fun runSet(commandString: String): JsonObject {
-//        val itr: Iterator<StrollToken> = tokenize(commandString)
+
+    }
+
+    private fun handleSet(entityStore: PersistentEntityStore, commandArguments: CommandArguments): SetResult {
+        TODO()
+        //        val itr: Iterator<StrollToken> = tokenize(commandString)
 //        val set = itr.next()
 //        assert(set.tokenType == TokenType.KEYWORD && set.tokenContent == "set")
 //        val entityId: String = itr.next().tokenContent
@@ -116,10 +86,12 @@ class StrollCommandRunner {
 //            result.add("result", entityToJsonObject(entity))
 //            result
 //        }
-//    }
-//
-//    private fun runDelete(commandString: String): JsonObject {
-//        val itr: Iterator<StrollToken> = tokenize(commandString)
+
+    }
+
+    private fun handleDelete(entityStore: PersistentEntityStore, commandArguments: CommandArguments): DeleteResult {
+        TODO()
+        //        val itr: Iterator<StrollToken> = tokenize(commandString)
 //        val delete = itr.next()
 //        assert(delete.tokenType == TokenType.KEYWORD && delete.tokenContent == "delete")
 //        val startBracketOrIdentity = itr.next()
@@ -153,10 +125,12 @@ class StrollCommandRunner {
 //            result.addProperty("total", total)
 //            result
 //        }
-//    }
-//
-//    private fun runFind(commandString: String): JsonObject {
-//        val itr: Iterator<StrollToken> = tokenize(commandString)
+
+    }
+
+    private fun handleFind(entityStore: PersistentEntityStore, commandArguments: CommandArguments): FindResult {
+        TODO()
+        //        val itr: Iterator<StrollToken> = tokenize(commandString)
 //        val find = itr.next()
 //        assert(find.tokenType == TokenType.KEYWORD && find.tokenContent == "find")
 //        val entityType: String = itr.next().tokenContent
@@ -224,9 +198,15 @@ class StrollCommandRunner {
 //            }
 //            result
 //        }
-//    }
-//
-//    private fun entityToJsonObject(entity: Entity): JsonObject {
+
+    }
+
+    private fun handleSimple(entityStore: PersistentEntityStore, commandArguments: CommandArguments): SimpleResult {
+        TODO()
+    }
+
+    private fun entityToReadEntity(entity: Entity): ReadEntity {
+        TODO()
 //        val properties = entity.propertyNames.map { propertyName ->
 //            Pair(propertyName, entity.getProperty(propertyName).toString())
 //        }
@@ -253,7 +233,38 @@ class StrollCommandRunner {
 //        result.add("links", jsonArrayLinks)
 //
 //        return result
-//    }
+    }
+
+    private fun setPropertiesAndLinks(transaction: StoreTransaction, entity: Entity, commandArguments: CommandArguments) {
+//        commandArguments.properties.forEach { property ->
+//            when (property.value.tokenType) {
+//                TokenType.DOUBLE -> entity.setProperty(property.key, property.value.tokenContent.toDouble())
+//                TokenType.LONG -> entity.setProperty(property.key, property.value.tokenContent.trim('L').toLong())
+//                TokenType.INT -> entity.setProperty(property.key, property.value.tokenContent.toInt())
+//                TokenType.STRING -> entity.setProperty(property.key, property.value.tokenContent)
+//                TokenType.KEYWORD -> entity.setProperty(property.key, property.value.tokenContent.toBoolean())
+//                else -> {
+//                    throw RuntimeException("Property type must be string, char, boolean, int, long or double.")
+//                }
+//            }
+//        }
+//        commandArguments.link.forEach {
+//            val linkedEntity = transaction.getEntity(transaction.toEntityId(it.value.tokenContent))
+//            entity.setLink(it.key, linkedEntity)
+//        }
+//        commandArguments.links.forEach {
+//            val linkedEntity = transaction.getEntity(transaction.toEntityId(it.second.tokenContent))
+//            entity.addLink(it.first, linkedEntity)
+//        }
+    }
 
 
+    private fun clearPropertiesAndLinks(entity: Entity) {
+        entity.propertyNames.forEach {
+            entity.deleteProperty(it)
+        }
+        entity.linkNames.forEach {
+            entity.deleteLinks(it)
+        }
+    }
 }

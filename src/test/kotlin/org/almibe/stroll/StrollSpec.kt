@@ -19,6 +19,7 @@ under the License.
 
 package org.almibe.stroll
 
+import io.kotlintest.shouldBe
 import io.kotlintest.specs.StringSpec
 import jetbrains.exodus.entitystore.PersistentEntityStore
 import jetbrains.exodus.entitystore.PersistentEntityStores
@@ -28,13 +29,13 @@ class StrollSpec : StringSpec({
     val entityStore: PersistentEntityStore = PersistentEntityStores.newInstance(Files.createTempDirectory("tmp").toFile())
     val stroll = Stroll(entityStore)
 
-//    "new with no properties" {
-//        val command = "new User {}"
-//        val result = stroll.run(command)
-//        result.getAsJsonPrimitive("operation").asString shouldBe "new"
-//        result.getAsJsonObject("result").getAsJsonPrimitive("entityId").asString shouldBe "0-0"
-//    }
-//
+    "new with no properties" {
+        val command = "new User {}"
+        val result = stroll.run(command)
+        val entity = ReadEntity("User", "0-0", listOf(), listOf())
+        result shouldBe NewResult(entity)
+    }
+
 //    "new with single property" {
 //        val command = "new User { age: 54 }"
 //        val result = stroll.run(command)
