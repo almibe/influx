@@ -50,10 +50,11 @@ fun readCommand(command: String): CommandArguments {
     val listener = StrollCommandListener()
     walker.walk(listener, parser.command())
     parser.command()
-    return listener.model
+    return listener.currentCommand
 }
 
 class StrollCommandListener : StrollBaseListener() {
-    val model = CommandArguments()
+    val currentCommand = CommandArguments()
+
 
 }

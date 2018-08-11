@@ -19,7 +19,15 @@ under the License.
 
 package org.almibe.stroll.runner
 
+import org.almibe.stroll.StrollResult
+import org.almibe.stroll.loader.CommandArguments
+
 class StrollCommandRunner {
+    fun runCommandArguments(commandArguments: CommandArguments): StrollResult {
+        TODO()
+    }
+
+
 //    private fun clearPropertiesAndLinks(entity: Entity) {
 //        entity.propertyNames.forEach {
 //            entity.deleteProperty(it)
