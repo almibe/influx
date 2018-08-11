@@ -236,28 +236,28 @@ class StrollCommandRunner {
     }
 
     private fun setPropertiesAndLinks(transaction: StoreTransaction, entity: Entity, commandArguments: CommandArguments) {
-//        commandArguments.properties.forEach { property ->
-//            when (property.value.tokenType) {
-//                TokenType.DOUBLE -> entity.setProperty(property.key, property.value.tokenContent.toDouble())
-//                TokenType.LONG -> entity.setProperty(property.key, property.value.tokenContent.trim('L').toLong())
-//                TokenType.INT -> entity.setProperty(property.key, property.value.tokenContent.toInt())
-//                TokenType.STRING -> entity.setProperty(property.key, property.value.tokenContent)
-//                TokenType.KEYWORD -> entity.setProperty(property.key, property.value.tokenContent.toBoolean())
-//                else -> {
-//                    throw RuntimeException("Property type must be string, char, boolean, int, long or double.")
-//                }
-//            }
-//        }
-//        commandArguments.link.forEach {
-//            val linkedEntity = transaction.getEntity(transaction.toEntityId(it.value.tokenContent))
-//            entity.setLink(it.key, linkedEntity)
-//        }
-//        commandArguments.links.forEach {
-//            val linkedEntity = transaction.getEntity(transaction.toEntityId(it.second.tokenContent))
-//            entity.addLink(it.first, linkedEntity)
-//        }
+        commandArguments.properties.forEach { name, property ->
+            when (property.type) {
+                "Double" -> entity.setProperty(name, property.value.toDouble())
+                "Long" -> entity.setProperty(name, property.value.trim('L').toLong())
+                "Int" -> entity.setProperty(name, property.value.toInt())
+                "String" -> entity.setProperty(name, property.value)
+                "Boolean" -> entity.setProperty(name, property.value.toBoolean())
+                "Other" -> entity.setProperty(name, property.value)
+                else -> {
+                    throw RuntimeException("Unexpected property $name - $property.")
+                }
+            }
+        }
+        commandArguments.link.forEach {
+            val linkedEntity = transaction.getEntity(transaction.toEntityId(it.value))
+            entity.setLink(it.key, linkedEntity)
+        }
+        commandArguments.links.forEach {
+            val linkedEntity = transaction.getEntity(transaction.toEntityId(it.second))
+            entity.addLink(it.first, linkedEntity)
+        }
     }
-
 
     private fun clearPropertiesAndLinks(entity: Entity) {
         entity.propertyNames.forEach {
