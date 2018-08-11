@@ -19,7 +19,7 @@ under the License.
 
 package org.almibe.stroll
 
-import jetbrains.exodus.entitystore.StoreTransaction
+import jetbrains.exodus.entitystore.EntityStore
 import org.almibe.stroll.loader.CommandArguments
 import org.almibe.stroll.loader.StrollCommandListener
 import org.almibe.stroll.parser.ModalStrollLexer
@@ -33,13 +33,25 @@ enum class CommandType {
     UPDATE,
     SET,
     DELETE,
-    FIND
+    FIND,
+    SIMPLE
 }
 
-data class StrollResult(val commandType: CommandType)
+data class ReadProperty(val propertyName: String, val propertyType: String, val stringValue: String)
+data class ReadLink(val linkName: String, val entityId: String)
+data class ReadEntity(val entityType: String, val entityId: String,
+                      val properties: Collection<ReadProperty>, val links: Collection<ReadLink>)
 
-class Stroll {
-    fun runCommand(command: String, transaction: StoreTransaction): StrollResult {
+sealed class StrollResult(val commandType: CommandType)
+data class NewResult(val newEntity: ReadEntity): StrollResult(CommandType.NEW)
+data class UpdateResult(val updatedEntity: ReadEntity): StrollResult(CommandType.UPDATE)
+data class SetResult(val setEntity: ReadEntity): StrollResult(CommandType.SET)
+data class DeleteResult(val totalDeleted: Int): StrollResult(CommandType.DELETE)
+data class FindResult(val entities: Collection<ReadEntity>): StrollResult(CommandType.FIND)
+data class SimpleResult(val commandName: String, val result: String): StrollResult(CommandType.SIMPLE)
+
+class Stroll(entityStore: EntityStore) {
+    fun run(command: String): StrollResult {
         val commandArguments = readCommand(command)
         TODO()
     }
