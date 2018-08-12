@@ -79,59 +79,68 @@ class StrollCommandRunner {
         val resultLists: MutableList<ReadEntity> = mutableListOf()
         val entityType = commandArguments.entityType
         return entityStore.computeInReadonlyTransaction { transaction ->
-            commandArguments.properties.forEach { name, property ->
-                val result = when(property.type) {
-                    "Int" ->
-                        transaction.find(entityType, name, property.value.toInt()).toList()
-                    "Double" ->
-                        transaction.find(entityType, name, property.value.toDouble()).toList()
-                    "Long" ->
-                        transaction.find(entityType, name, property.value.toLong()).toList()
-                    "String" ->
-                        transaction.find(entityType, name, property.value.toString()).toList()
-                    "Boolean" ->
-                        transaction.find(entityType, name, property.value.toBoolean()).toList()
-                    else -> throw RuntimeException()
-                }
-                result.forEach { entity: Entity ->
+            if (commandArguments.properties.isEmpty() &&
+                    commandArguments.link.isEmpty() &&
+                    commandArguments.links.isEmpty() &&
+                    commandArguments.propertyExistsCheck.isEmpty() &&
+                    commandArguments.linkExistsCheck.isEmpty()) { //TODO check range and startsWith here eventually
+                transaction.getAll(entityType).forEach { entity ->
                     resultLists.add(entityToReadEntity(entity))
                 }
-            }
-
-            commandArguments.link.forEach { name, entityId ->
-                val links = transaction.findLinks(entityType,
-                        transaction.getEntity(transaction.toEntityId(entityId)),
-                        name)
-                links.forEach { entity ->
-                    resultLists.add(entityToReadEntity(entity))
+            } else {
+                commandArguments.properties.forEach { name, property ->
+                    val result = when(property.type) {
+                        "Int" ->
+                            transaction.find(entityType, name, property.value.toInt()).toList()
+                        "Double" ->
+                            transaction.find(entityType, name, property.value.toDouble()).toList()
+                        "Long" ->
+                            transaction.find(entityType, name, property.value.toLong()).toList()
+                        "String" ->
+                            transaction.find(entityType, name, property.value.toString()).toList()
+                        "Boolean" ->
+                            transaction.find(entityType, name, property.value.toBoolean()).toList()
+                        else -> throw RuntimeException()
+                    }
+                    result.forEach { entity: Entity ->
+                        resultLists.add(entityToReadEntity(entity))
+                    }
                 }
-            }
 
-            commandArguments.links.forEach { link: Pair<String, String> ->
-                val links = transaction.findLinks(entityType,
-                        transaction.getEntity(transaction.toEntityId(link.second)),
-                        link.first)
-                links.forEach { entity ->
-                    resultLists.add(entityToReadEntity(entity))
+                commandArguments.link.forEach { name, entityId ->
+                    val links = transaction.findLinks(entityType,
+                            transaction.getEntity(transaction.toEntityId(entityId)),
+                            name)
+                    links.forEach { entity ->
+                        resultLists.add(entityToReadEntity(entity))
+                    }
                 }
-            }
 
-            commandArguments.propertyExistsCheck.forEach { propertyName: String ->
-                val withProp = transaction.findWithProp(entityType, propertyName)
-                withProp.forEach { entity ->
-                    resultLists.add(entityToReadEntity(entity))
+                commandArguments.links.forEach { link: Pair<String, String> ->
+                    val links = transaction.findLinks(entityType,
+                            transaction.getEntity(transaction.toEntityId(link.second)),
+                            link.first)
+                    links.forEach { entity ->
+                        resultLists.add(entityToReadEntity(entity))
+                    }
                 }
-            }
 
-            commandArguments.linkExistsCheck.forEach { linkName: String ->
-                val withLinks = transaction.findWithLinks(entityType, linkName)
-                withLinks.forEach { entity ->
-                    resultLists.add(entityToReadEntity(entity))
+                commandArguments.propertyExistsCheck.forEach { propertyName: String ->
+                    val withProp = transaction.findWithProp(entityType, propertyName)
+                    withProp.forEach { entity ->
+                        resultLists.add(entityToReadEntity(entity))
+                    }
                 }
+
+                commandArguments.linkExistsCheck.forEach { linkName: String ->
+                    val withLinks = transaction.findWithLinks(entityType, linkName)
+                    withLinks.forEach { entity ->
+                        resultLists.add(entityToReadEntity(entity))
+                    }
+                }
+
+                //TODO eventually handle ranges and startsWith here
             }
-
-            //TODO eventually handle ranges and startsWith here
-
             FindResult(resultLists)
         }
     }
