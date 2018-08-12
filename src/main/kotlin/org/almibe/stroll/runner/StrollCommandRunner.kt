@@ -76,7 +76,7 @@ class StrollCommandRunner {
     }
 
     private fun handleFind(entityStore: PersistentEntityStore, commandArguments: CommandArguments): FindResult {
-        val resultLists: MutableList<ReadEntity> = mutableListOf()
+        val resultLists: MutableList<List<ReadEntity>> = mutableListOf()
         val entityType = commandArguments.entityType
         return entityStore.computeInReadonlyTransaction { transaction ->
             if (commandArguments.properties.isEmpty() &&
@@ -85,7 +85,7 @@ class StrollCommandRunner {
                     commandArguments.propertyExistsCheck.isEmpty() &&
                     commandArguments.linkExistsCheck.isEmpty()) { //TODO check range and startsWith here eventually
                 transaction.getAll(entityType).forEach { entity ->
-                    resultLists.add(entityToReadEntity(entity))
+                    resultLists.add(listOf(entityToReadEntity(entity)))
                 }
             } else {
                 commandArguments.properties.forEach { name, property ->
@@ -103,7 +103,7 @@ class StrollCommandRunner {
                         else -> throw RuntimeException()
                     }
                     result.forEach { entity: Entity ->
-                        resultLists.add(entityToReadEntity(entity))
+                        resultLists.add(listOf(entityToReadEntity(entity)))
                     }
                 }
 
@@ -112,7 +112,7 @@ class StrollCommandRunner {
                             transaction.getEntity(transaction.toEntityId(entityId)),
                             name)
                     links.forEach { entity ->
-                        resultLists.add(entityToReadEntity(entity))
+                        resultLists.add(listOf(entityToReadEntity(entity)))
                     }
                 }
 
@@ -121,27 +121,37 @@ class StrollCommandRunner {
                             transaction.getEntity(transaction.toEntityId(link.second)),
                             link.first)
                     links.forEach { entity ->
-                        resultLists.add(entityToReadEntity(entity))
+                        resultLists.add(listOf(entityToReadEntity(entity)))
                     }
                 }
 
                 commandArguments.propertyExistsCheck.forEach { propertyName: String ->
                     val withProp = transaction.findWithProp(entityType, propertyName)
                     withProp.forEach { entity ->
-                        resultLists.add(entityToReadEntity(entity))
+                        resultLists.add(listOf(entityToReadEntity(entity)))
                     }
                 }
 
                 commandArguments.linkExistsCheck.forEach { linkName: String ->
                     val withLinks = transaction.findWithLinks(entityType, linkName)
                     withLinks.forEach { entity ->
-                        resultLists.add(entityToReadEntity(entity))
+                        resultLists.add(listOf(entityToReadEntity(entity)))
                     }
                 }
 
                 //TODO eventually handle ranges and startsWith here
             }
-            FindResult(resultLists)
+
+            val resultList = mutableListOf<ReadEntity>()
+            val iterator = resultLists.iterator()
+            if (iterator.hasNext()) {
+                resultList.addAll(iterator.next())
+            }
+            while (iterator.hasNext()) {
+                val next = iterator.next()
+                resultList.retainAll(next)
+            }
+            FindResult(resultList)
         }
     }
 

@@ -162,6 +162,8 @@ class StrollCommandListener : StrollListener {
         throw RuntimeException("In error node. $node")
     }
 
+    override fun enterFindParameters(p0: Stroll.FindParametersContext) {}
+    override fun exitFindParameters(p0: Stroll.FindParametersContext) {}
     override fun exitPropertyValue(p0: Stroll.PropertyValueContext?) {}
     override fun exitFindParameter(context: Stroll.FindParameterContext) {}
     override fun enterLinksListAssigment(p0: Stroll.LinksListAssigmentContext?) {}
