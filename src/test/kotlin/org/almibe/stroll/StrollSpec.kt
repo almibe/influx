@@ -196,7 +196,7 @@ class StrollSpec : StringSpec({
         val command = "new test.space.User { username:\"Juniper\" }"
         val result = stroll.run(command)
 
-        val entity = ReadEntity("test.space.User", "0-0",
+        val entity = ReadEntity("test.space.User", "3-0",
                 setOf(ReadProperty("username", "String", "Juniper")),
                 setOf()
         )
