@@ -148,67 +148,60 @@ class StrollSpec : StringSpec({
 
         result shouldBe FindResult(listOf())
     }
-//    "find all Users" {
-//        val command = "find User {}"
-//        val result = stroll.run(command)
-//        result.getAsJsonPrimitive("operation").asString shouldBe "find"
-//        result.getAsJsonArray("results").size() shouldBe 5
-//    }
-//    "find User based on properties" {
-//        val command = "find User { age: 24 }"
-//        val result = stroll.run(command)
-//        result.getAsJsonPrimitive("operation").asString shouldBe "find"
-//        result.getAsJsonArray("results").size() shouldBe 1
-//
-//        val command2 = "find User { name: \"Bill\", age: 45 }"
-//        val result2 = stroll.run(command2)
-//        result2.getAsJsonPrimitive("operation").asString shouldBe "find"
-//        result2.getAsJsonArray("results").size() shouldBe 1
-//    }
-//
-//    "find User based on link" {
-//        val command = "find User { contact -> 0-2, name: \"Margret\" }"
-//        val result = stroll.run(command)
-//        result.getAsJsonPrimitive("operation").asString shouldBe "find"
-//        result.getAsJsonArray("results").size() shouldBe 1
-//    }
-//
-//    "find User based on links" {
-//        val command = "find User { supervises => [ 0-1, 0-3 ] }"
-//        val result = stroll.run(command)
-//        result.getAsJsonPrimitive("operation").asString shouldBe "find"
-//        result.getAsJsonArray("results").size() shouldBe 1
-//    }
-//
-//    "find Users with property and link exists queries" {
-//        val command = "find User { supervises => _ }"
-//        val result = stroll.run(command)
-//        result.getAsJsonPrimitive("operation").asString shouldBe "find"
-//        result.getAsJsonArray("results").size() shouldBe 1
-//
-//        val command1 = "find User { supervises -> _ }"
-//        val result1 = stroll.run(command1)
-//        result1.getAsJsonPrimitive("operation").asString shouldBe "find"
-//        result1.getAsJsonArray("results").size() shouldBe 1
-//
-//
-//        val command2 = "find User { username: _ }"
-//        val result2 = stroll.run(command2)
-//        result2.getAsJsonPrimitive("operation").asString shouldBe "find"
-//        result2.getAsJsonArray("results").size() shouldBe 1
-//    }
-//
-//    "new and find with namespaced id" {
-//        val command = "new test.space.User { username:\"Juniper\" }"
-//        val result = stroll.run(command)
-//        result.getAsJsonPrimitive("operation").asString shouldBe "new"
-//        result.getAsJsonObject("result").getAsJsonPrimitive("entityId").asString shouldBe "3-0"
-//
-//        val findCommand = ""
-//        val findResult = stroll.run(command)
-//    }
 
+    "find all Users" {
+        val command = "find User {}"
+        val result = stroll.run(command)
 
+        (result as FindResult).entities.size shouldBe 5
+    }
+
+    "find User based on properties" {
+        val command = "find User { age: 24 }"
+        val result = stroll.run(command)
+        (result as FindResult).entities.size shouldBe 1
+
+        val command2 = "find User { name: \"Bill\", age: 45 }"
+        val result2 = stroll.run(command2)
+        (result2 as FindResult).entities.size shouldBe 1
+    }
+
+    "find User based on link" {
+        val command = "find User { contact -> 0-2, name: \"Margret\" }"
+        val result = stroll.run(command)
+        (result as FindResult).entities.size shouldBe 1
+    }
+
+    "find User based on links" {
+        val command = "find User { supervises => [ 0-1, 0-3 ] }"
+        val result = stroll.run(command)
+        (result as FindResult).entities.size shouldBe 1
+    }
+
+    "find Users with property and link exists queries" {
+        val command = "find User { supervises => _ }"
+        val result = stroll.run(command)
+        (result as FindResult).entities.size shouldBe 1
+
+        val command1 = "find User { supervises -> _ }"
+        val result1 = stroll.run(command1)
+        (result1 as FindResult).entities.size shouldBe 1
+
+        val command2 = "find User { username: _ }"
+        val result2 = stroll.run(command2)
+        (result2 as FindResult).entities.size shouldBe 1
+    }
+
+    "new and find with namespaced id" {
+        val command = "new test.space.User { username:\"Juniper\" }"
+        val result = stroll.run(command)
+
+        val entity = ReadEntity("test.space.User", "0-0",
+                setOf(ReadProperty("username", "String", "Juniper")),
+                setOf()
+        )
+        result shouldBe NewResult(entity)
+    }
 
 //    "find within a range using to" {
 //        val command = "find User { age: 40 to 49 }"
