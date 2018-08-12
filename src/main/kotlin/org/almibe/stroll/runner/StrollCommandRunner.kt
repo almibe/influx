@@ -76,76 +76,54 @@ class StrollCommandRunner {
     }
 
     private fun handleFind(entityStore: PersistentEntityStore, commandArguments: CommandArguments): FindResult {
-        TODO()
-        //        val itr: Iterator<StrollToken> = tokenize(commandString)
-//        val find = itr.next()
-//        assert(find.tokenType == TokenType.KEYWORD && find.tokenContent == "find")
-//        val entityType: String = itr.next().tokenContent
-//
-//        val commandArguments = readCommandArguments(itr) ?: throw RuntimeException()
-//
-//        val resultLists: MutableList<List<Entity>> = mutableListOf()
-//        return entityStore.computeInReadonlyTransaction { transaction ->
-//            commandArguments.properties.forEach { property ->
-//                val result = when(property.value.tokenType) {
-//                    TokenType.INT ->
-//                        transaction.find(entityType, property.key, property.value.tokenContent.toInt()).toList()
-//                    TokenType.DOUBLE ->
-//                        transaction.find(entityType, property.key, property.value.tokenContent.toDouble()).toList()
-//                    TokenType.LONG ->
-//                        transaction.find(entityType, property.key, property.value.tokenContent.toLong()).toList()
-//                    TokenType.STRING ->
-//                        transaction.find(entityType, property.key, property.value.tokenContent.toString()).toList()
-//                    TokenType.KEYWORD ->
-//                        transaction.find(entityType, property.key, property.value.tokenContent.toBoolean()).toList()
-//                    else -> throw RuntimeException()
-//                }
-//                resultLists.add(result)
-//            }
+        val resultLists: MutableList<ReadEntity> = mutableListOf()
+        val entityType = commandArguments.entityType
+        return entityStore.computeInReadonlyTransaction { transaction ->
+            commandArguments.properties.forEach { name, property ->
+                val result = when(property.type) {
+                    "Int" ->
+                        transaction.find(entityType, name, property.value.toInt()).toList()
+                    "Double" ->
+                        transaction.find(entityType, name, property.value.toDouble()).toList()
+                    "Long" ->
+                        transaction.find(entityType, name, property.value.toLong()).toList()
+                    "String" ->
+                        transaction.find(entityType, name, property.value.toString()).toList()
+                    "Boolean" ->
+                        transaction.find(entityType, name, property.value.toBoolean()).toList()
+                    else -> throw RuntimeException()
+                }
+                result.forEach { entity: Entity ->
+                    resultLists.add(entityToReadEntity(entity))
+                }
+            }
+
 //            commandArguments.link.forEach { link ->
 //                val links = transaction.findLinks(entityType,
 //                        transaction.getEntity(transaction.toEntityId(link.value.tokenContent)),
 //                        link.key)
 //                resultLists.add(links.toList())
 //            }
+//
 //            commandArguments.links.forEach { link ->
 //                val links = transaction.findLinks(entityType,
 //                        transaction.getEntity(transaction.toEntityId(link.second.tokenContent)),
 //                        link.first)
 //                resultLists.add(links.toList())
 //            }
+//
 //            commandArguments.propertyExistsCheck.forEach { propertyName ->
 //                val withProp = transaction.findWithProp(entityType, propertyName)
 //                resultLists.add(withProp.toList())
 //            }
+//
 //            commandArguments.linkExistsCheck.forEach { linkName ->
 //                val withLinks = transaction.findWithLinks(entityType, linkName)
 //                resultLists.add(withLinks.toList())
 //            }
-//            //TODO eventually handle ranges and startsWith here
-//
-//            val result = JsonObject()
-//            result.addProperty("operation", "find")
-//            val resultItr = resultLists.iterator()
-//            val resultArray = JsonArray()
-//            result.add("results", resultArray)
-//
-//            if (!resultItr.hasNext()) {
-//                transaction.getAll(entityType).forEach {
-//                    resultArray.add(entityToJsonObject(it))
-//                }
-//            } else {
-//                var workingResults = resultItr.next().toMutableList()
-//                while (resultItr.hasNext()) {
-//                    workingResults = workingResults.intersect(resultItr.next()).toMutableList()
-//                }
-//                workingResults.forEach {
-//                    resultArray.add(entityToJsonObject(it))
-//                }
-//            }
-//            result
-//        }
-
+            //TODO eventually handle ranges and startsWith here
+            FindResult(resultLists)
+        }
     }
 
     private fun handleSimple(entityStore: PersistentEntityStore, commandArguments: CommandArguments): SimpleResult {

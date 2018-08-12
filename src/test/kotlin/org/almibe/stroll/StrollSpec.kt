@@ -142,12 +142,12 @@ class StrollSpec : StringSpec({
         result shouldBe DeleteResult(2)
     }
 
-//    "find that all DeleteTest entites have been deleted" {
-//        val command = "find DeleteTest {}"
-//        val result = stroll.run(command)
-//        result.getAsJsonPrimitive("operation").asString shouldBe "find"
-//        result.getAsJsonArray("results").size() shouldBe 0
-//    }
+    "find that all DeleteTest entites have been deleted" {
+        val command = "find DeleteTest {}"
+        val result = stroll.run(command)
+
+        result shouldBe FindResult(listOf())
+    }
 //    "find all Users" {
 //        val command = "find User {}"
 //        val result = stroll.run(command)
