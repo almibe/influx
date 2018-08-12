@@ -84,9 +84,11 @@ class StrollCommandRunner {
                     commandArguments.links.isEmpty() &&
                     commandArguments.propertyExistsCheck.isEmpty() &&
                     commandArguments.linkExistsCheck.isEmpty()) { //TODO check range and startsWith here eventually
+                val readEntityList = mutableListOf<ReadEntity>()
                 transaction.getAll(entityType).forEach { entity ->
-                    resultLists.add(listOf(entityToReadEntity(entity)))
+                    readEntityList.add(entityToReadEntity(entity))
                 }
+                resultLists.add(readEntityList)
             } else {
                 commandArguments.properties.forEach { name, property ->
                     val result = when(property.type) {
@@ -143,9 +145,10 @@ class StrollCommandRunner {
             }
 
             val resultList = mutableListOf<ReadEntity>()
-            val iterator = resultLists.iterator()
+            val iterator: Iterator<List<ReadEntity>> = resultLists.iterator()
             if (iterator.hasNext()) {
-                resultList.addAll(iterator.next())
+                val list = iterator.next()
+                resultList.addAll(list)
             }
             while (iterator.hasNext()) {
                 val next = iterator.next()
