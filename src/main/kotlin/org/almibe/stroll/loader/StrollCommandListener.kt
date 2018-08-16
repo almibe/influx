@@ -31,21 +31,7 @@ import org.antlr.v4.runtime.tree.ParseTreeWalker
 import org.antlr.v4.runtime.tree.TerminalNode
 
 data class Property(val type: String, val value: String)
-data class CommandArguments (
-        var commandType: CommandType? = null,
-        var entityType: String = "", //used by new
-        var entityId: String = "", //used by set update
-        val entityIds: MutableList<String> = mutableListOf(), //used by delete
-        var commandName: String = "", //used by simple command
-        //three collections used by all commands
-        val properties: MutableMap<String, Property> = mutableMapOf(),
-        val link: MutableMap<String, String> = mutableMapOf(),
-        val links: MutableList<Pair<String, String>> = mutableListOf(),
-        //collections only used by find
-        val propertyExistsCheck: MutableList<String> = mutableListOf(),
-        val linkExistsCheck: MutableList<String> = mutableListOf()
-        //TODO eventually this will contain range and startsWith info
-)
+
 data class StrollScript(
         val expression: List<Expression>
 )
