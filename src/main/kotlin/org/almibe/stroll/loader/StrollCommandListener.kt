@@ -33,7 +33,7 @@ import org.antlr.v4.runtime.tree.TerminalNode
 data class Property(val type: String, val value: String)
 
 data class StrollScript(
-        val expression: List<Expression>
+        val expression: MutableList<Expression> = mutableListOf()
 )
 interface ExpressionArgument
 
@@ -56,8 +56,8 @@ data class PropertyValue(val value: String): ExpressionArgument
 
 data class Identitiy(val identity: String): ExpressionArgument
 
-fun readCommand(command: String): CommandArguments {
-    val stream = CharStreams.fromString(command)
+fun readScript(script: String): StrollScript {
+    val stream = CharStreams.fromString(script)
     val lexer = ModalStrollLexer(stream)
     val tokens = CommonTokenStream(lexer)
     val parser = Stroll(tokens)
@@ -65,10 +65,12 @@ fun readCommand(command: String): CommandArguments {
     val listener = StrollCommandListener()
     walker.walk(listener, parser.script())
     parser.script()
-    return listener.currentCommand
+    return listener.currentScript
 }
 
 class StrollCommandListener : StrollListener {
+    val currentScript = StrollScript()
+
     override fun exitMethodCall(p0: Stroll.MethodCallContext?) {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
@@ -104,8 +106,6 @@ class StrollCommandListener : StrollListener {
     override fun enterMethodCall(p0: Stroll.MethodCallContext?) {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
-
-    val currentCommand = CommandArguments()
 
     override fun exitExpression(p0: Stroll.ExpressionContext?) {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
