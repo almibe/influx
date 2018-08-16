@@ -35,16 +35,15 @@ data class Property(val type: String, val value: String)
 data class StrollScript(
         val expression: List<Expression>
 )
+interface ExpressionArgument
 
-data class Expression(
+data class Expression (
         val assignmentVariableName: String?,
         val methodCallVariableName: String?,
         val expressionName: String,
         val arguments: List<ExpressionArgument>,
         val chained: Boolean
-)
-
-interface ExpressionArgument
+): ExpressionArgument
 
 data class EntityPattern(
         val properties: MutableMap<String, Property> = mutableMapOf(),
