@@ -46,6 +46,30 @@ data class CommandArguments (
         val linkExistsCheck: MutableList<String> = mutableListOf()
         //TODO eventually this will contain range and startsWith info
 )
+data class StrollScript(
+        val expression: List<Expression>
+)
+
+data class Expression(
+        val assignmentVariableName: String?,
+        val methodCallVariableName: String?,
+        val expressionName: String,
+        val arguments: List<ExpressionArgument>,
+        val chained: Boolean
+)
+
+interface ExpressionArgument
+
+data class EntityPattern(
+        val properties: MutableMap<String, Property> = mutableMapOf(),
+        val link: MutableMap<String, String> = mutableMapOf(),
+        val links: MutableList<Pair<String, String>> = mutableListOf())
+
+data class Keyword(val keyword: String): ExpressionArgument
+
+data class PropertyValue(val value: String): ExpressionArgument
+
+data class Identitiy(val identity: String): ExpressionArgument
 
 fun readCommand(command: String): CommandArguments {
     val stream = CharStreams.fromString(command)
