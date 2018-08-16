@@ -54,44 +54,52 @@ fun readCommand(command: String): CommandArguments {
     val parser = Stroll(tokens)
     val walker = ParseTreeWalker()
     val listener = StrollCommandListener()
-    walker.walk(listener, parser.command())
-    parser.command()
+    walker.walk(listener, parser.script())
+    parser.script()
     return listener.currentCommand
 }
 
 class StrollCommandListener : StrollListener {
+    override fun exitMethodCall(p0: Stroll.MethodCallContext?) {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    override fun exitExpressionArguements(p0: Stroll.ExpressionArguementsContext?) {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    override fun enterScript(p0: Stroll.ScriptContext?) {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    override fun enterEntityPattern(p0: Stroll.EntityPatternContext?) {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    override fun enterAssignedExpression(p0: Stroll.AssignedExpressionContext?) {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    override fun enterExpressionArguements(p0: Stroll.ExpressionArguementsContext?) {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    override fun exitAssignedExpression(p0: Stroll.AssignedExpressionContext?) {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    override fun exitEntityPattern(p0: Stroll.EntityPatternContext?) {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    override fun enterMethodCall(p0: Stroll.MethodCallContext?) {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
     val currentCommand = CommandArguments()
 
-    override fun exitNewCommand(context: Stroll.NewCommandContext) {
-        currentCommand.commandType = CommandType.NEW
-        currentCommand.entityType = context.NAME().text
-    }
-
-    override fun exitUpdateCommand(context: Stroll.UpdateCommandContext) {
-        currentCommand.commandType = CommandType.UPDATE
-        currentCommand.entityId = context.IDENTITY().text
-    }
-
-    override fun exitSetCommand(context: Stroll.SetCommandContext) {
-        currentCommand.commandType = CommandType.SET
-        currentCommand.entityId = context.IDENTITY().text
-    }
-
-    override fun exitDeleteCommand(context: Stroll.DeleteCommandContext) {
-        currentCommand.commandType = CommandType.DELETE
-        context.IDENTITY().forEach { node ->
-            currentCommand.entityIds.add(node.text)
-        }
-    }
-
-    override fun exitFindCommand(context: Stroll.FindCommandContext) {
-        currentCommand.commandType = CommandType.FIND
-        currentCommand.entityType = context.NAME().text
-    }
-
-    override fun exitSimpleCommand(context: Stroll.SimpleCommandContext) {
-        currentCommand.commandType = CommandType.SIMPLE
-        currentCommand.commandName = context.NAME().text
+    override fun exitExpression(p0: Stroll.ExpressionContext?) {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
     override fun exitPropertyAssignment(context: Stroll.PropertyAssignmentContext) {
@@ -142,52 +150,20 @@ class StrollCommandListener : StrollListener {
         currentCommand.links.addAll(linkTo)
     }
 
-    override fun exitLinkExists(context: Stroll.LinkExistsContext) {
-        currentCommand.linkExistsCheck.add(context.NAME().text)
-    }
-
-    override fun exitPropertyExists(context: Stroll.PropertyExistsContext) {
-        currentCommand.propertyExistsCheck.add(context.NAME().text)
-    }
-
-    override fun exitPropertyStartsWith(p0: Stroll.PropertyStartsWithContext?) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-    override fun exitPropertyRange(p0: Stroll.PropertyRangeContext?) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
     override fun visitErrorNode(node: ErrorNode) {
         throw RuntimeException("In error node. $node")
     }
 
-    override fun enterFindParameters(p0: Stroll.FindParametersContext) {}
-    override fun exitFindParameters(p0: Stroll.FindParametersContext) {}
+    override fun enterExpression(p0: Stroll.ExpressionContext?) {}
     override fun exitPropertyValue(p0: Stroll.PropertyValueContext?) {}
-    override fun exitFindParameter(context: Stroll.FindParameterContext) {}
     override fun enterLinksListAssigment(p0: Stroll.LinksListAssigmentContext?) {}
-    override fun exitCommand(p0: Stroll.CommandContext?) {}
-    override fun enterSetCommand(p0: Stroll.SetCommandContext?) {}
     override fun enterPropertyAssignment(p0: Stroll.PropertyAssignmentContext?) {}
-    override fun enterFindCommand(p0: Stroll.FindCommandContext?) {}
-    override fun enterPropertyRange(p0: Stroll.PropertyRangeContext?) {}
     override fun enterLinkAssignment(p0: Stroll.LinkAssignmentContext?) {}
-    override fun enterFindParameter(p0: Stroll.FindParameterContext?) {}
-    override fun enterDeleteCommand(p0: Stroll.DeleteCommandContext?) {}
-    override fun enterSimpleCommand(p0: Stroll.SimpleCommandContext?) {}
-    override fun enterPropertyExists(p0: Stroll.PropertyExistsContext?) {}
-    override fun enterLinkExists(p0: Stroll.LinkExistsContext?) {}
-    override fun enterPropertyStartsWith(p0: Stroll.PropertyStartsWithContext?) {}
-    override fun enterUpdateCommand(p0: Stroll.UpdateCommandContext?) {}
     override fun enterPropertyValue(p0: Stroll.PropertyValueContext?) {}
     override fun visitTerminal(node: TerminalNode?) {}
     override fun enterEveryRule(ctx: ParserRuleContext) {}
     override fun exitEveryRule(ctx: ParserRuleContext) {}
-    override fun enterPropertyOrLinkAssignments(context: Stroll.PropertyOrLinkAssignmentsContext) {}
-    override fun enterCommand(context: Stroll.CommandContext) {}
-    override fun enterNewCommand(context: Stroll.NewCommandContext) {}
     override fun enterPropertyOrLinkAssignment(context: Stroll.PropertyOrLinkAssignmentContext) {}
     override fun exitPropertyOrLinkAssignment(context: Stroll.PropertyOrLinkAssignmentContext) {}
-    override fun exitPropertyOrLinkAssignments(p0: Stroll.PropertyOrLinkAssignmentsContext?) {}
+    override fun exitScript(p0: Stroll.ScriptContext?) {}
 }
