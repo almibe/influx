@@ -20,36 +20,19 @@ under the License.
 package org.almibe.stroll
 
 import jetbrains.exodus.entitystore.PersistentEntityStore
-import org.almibe.stroll.loader.readCommand
-import org.almibe.stroll.runner.StrollCommandRunner
-
-enum class CommandType {
-    NEW,
-    UPDATE,
-    SET,
-    DELETE,
-    FIND,
-    SIMPLE
-}
+import org.almibe.stroll.loader.readScript
+import org.almibe.stroll.runner.StrollScriptRunner
 
 data class ReadProperty(val propertyName: String, val propertyType: String, val stringValue: String)
 data class ReadLink(val linkName: String, val entityId: String)
 data class ReadEntity(val entityType: String, val entityId: String,
                       val properties: Set<ReadProperty>, val links: Set<ReadLink>)
 
-sealed class StrollResult(val commandType: CommandType)
-data class NewResult(val newEntity: ReadEntity): StrollResult(CommandType.NEW)
-data class UpdateResult(val updatedEntity: ReadEntity): StrollResult(CommandType.UPDATE)
-data class SetResult(val setEntity: ReadEntity): StrollResult(CommandType.SET)
-data class DeleteResult(val totalDeleted: Int): StrollResult(CommandType.DELETE)
-data class FindResult(val entities: List<ReadEntity>): StrollResult(CommandType.FIND)
-data class SimpleResult(val commandName: String, val result: String): StrollResult(CommandType.SIMPLE)
-
 class Stroll(val entityStore: PersistentEntityStore) {
-    private val commandRunner = StrollCommandRunner()
+    private val scriptRunner = StrollScriptRunner()
 
-    fun run(command: String): StrollResult {
-        val commandArguments = readCommand(command)
-        return commandRunner.runCommandArguments(entityStore, commandArguments)
+    fun run(script: String): String {
+        val readScript = readScript(script)
+        return scriptRunner.runStrollScript(entityStore, readScript)
     }
 }
