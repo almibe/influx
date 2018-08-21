@@ -1,23 +1,24 @@
 # Stroll
-This project is a simple DSL for working with Xodus EntityStores' api.
+
+**This project is still very early in its development.**
+
+This project is a simple external DSL for working with Xodus EntityStores' api.
 It does not attempt to replace what can be done by directly working with the provided api.
 Instead it focuses on allowing a simple command structure for adding and searching for entities
 within the context of debugging or management.
 
-**This project is still very early in its development.**
-
 See `org.almibe.stroll.StrollSpec` in `src/test/kotlin` and issues for current status.
 
-Example commands
+Examples
 
 ```
-new User { name: "Alex", hp: 42, employer => 8-3 }
-new Character { name: "Billy Lee", games => [ 0-34, 0-344, 0-324,0-134 ], rightsHolder -> 2-404 }
-delete 1-55
-delete [1-55, 1-556]
-find Character { games => 0-45 }
-update 1-44 { name: "Chuck Rock" }
-set 1-45 { name: "Bobert" }
+stroll.new { User name: "Alex", hp: 42, employer => 8-3 }
+stroll.new { Character name: "Billy Lee", games => [ 0-34, 0-344, 0-324,0-134 ], rightsHolder -> 2-404 }
+stroll.delete { 1-55 }
+stroll.delete { [1-55, 1-556] }
+stroll.find { Character games => 0-45 }
+stroll.update { 1-44 name: "Chuck Rock" }
+stroll.set { 1-45 name: "Bobert" }
 ```
 
 Notes:
