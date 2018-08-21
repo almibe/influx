@@ -29,8 +29,6 @@ import org.antlr.v4.runtime.tree.ErrorNode
 import org.antlr.v4.runtime.tree.ParseTreeWalker
 import org.antlr.v4.runtime.tree.TerminalNode
 
-data class Property(val type: String, val value: String)
-
 data class StrollScript(
         val lines: MutableList<Line> = mutableListOf()
 )
@@ -43,8 +41,16 @@ data class Line (
 )
 
 interface MethodContent
-interface ContentPunctutation: MethodContent //TODO can this be an enum that implements MethodContent?
-interface ContentValue: MethodContent //TODO can this be an enum with a `value` that implements MethodContent?
+
+enum class ContentPunctutation: MethodContent {
+    COLON, COMMA, START_BRACKET, END_BRACKET, ARROW, FAT_ARROW
+}
+
+enum class ValueType {
+    STRING, INT, LONG, DOUBLE, BOOLEAN, UNDERSCORE, IDENTITY, NAME, VARIABLE
+}
+
+data class ContentValue(val type: ValueType, val value: String): MethodContent
 
 fun readScript(script: String): StrollScript {
     val stream = CharStreams.fromString(script)
@@ -52,14 +58,18 @@ fun readScript(script: String): StrollScript {
     val tokens = CommonTokenStream(lexer)
     val parser = Stroll(tokens)
     val walker = ParseTreeWalker()
-    val listener = StrollCommandListener()
+    val listener = StrollScriptListener()
     walker.walk(listener, parser.script())
     parser.script()
     return listener.currentScript
 }
 
-class StrollCommandListener : StrollListener {
+class StrollScriptListener : StrollListener {
     val currentScript: StrollScript = StrollScript()
+
+    override fun enterContentPunctuation(p0: Stroll.ContentPunctuationContext?) {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
 
     override fun exitLine(p0: Stroll.LineContext?) {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
@@ -69,11 +79,11 @@ class StrollCommandListener : StrollListener {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    override fun enterContentPuncutation(p0: Stroll.ContentPuncutationContext?) {
+    override fun enterScript(p0: Stroll.ScriptContext?) {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    override fun enterScript(p0: Stroll.ScriptContext?) {
+    override fun exitContentPunctuation(p0: Stroll.ContentPunctuationContext?) {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
@@ -110,10 +120,6 @@ class StrollCommandListener : StrollListener {
     }
 
     override fun visitErrorNode(node: ErrorNode?) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-    override fun exitContentPuncutation(p0: Stroll.ContentPuncutationContext?) {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
