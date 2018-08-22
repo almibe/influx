@@ -36,13 +36,13 @@ data class StrollScript(
 data class Line (
         val assignmentVariableName: String?,
         val methodCallVariableName: String,
-        val methodName: String,
-        val parameters: List<MethodContent>
+        val callName: String,
+        val callContents: List<CallContent>
 )
 
-interface MethodContent
+interface CallContent
 
-enum class ContentPunctutation: MethodContent {
+enum class CallPunctutation: CallContent {
     COLON, COMMA, START_BRACKET, END_BRACKET, ARROW, FAT_ARROW
 }
 
@@ -50,7 +50,7 @@ enum class ValueType {
     STRING, INT, LONG, DOUBLE, BOOLEAN, UNDERSCORE, IDENTITY, NAME, VARIABLE
 }
 
-data class ContentValue(val type: ValueType, val value: String): MethodContent
+data class CallValue(val type: ValueType, val value: String): CallContent
 
 fun readScript(script: String): StrollScript {
     val stream = CharStreams.fromString(script)
@@ -67,7 +67,7 @@ fun readScript(script: String): StrollScript {
 class StrollScriptListener : StrollListener {
     val currentScript: StrollScript = StrollScript()
 
-    override fun enterContentPunctuation(p0: Stroll.ContentPunctuationContext?) {
+    override fun enterCallPunctuation(p0: Stroll.CallPunctuationContext?) {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
@@ -75,7 +75,11 @@ class StrollScriptListener : StrollListener {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    override fun enterContentValue(p0: Stroll.ContentValueContext?) {
+    override fun enterCallContents(p0: Stroll.CallContentsContext?) {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    override fun exitCallContents(p0: Stroll.CallContentsContext?) {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
@@ -83,7 +87,15 @@ class StrollScriptListener : StrollListener {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    override fun exitContentPunctuation(p0: Stroll.ContentPunctuationContext?) {
+    override fun enterCall(p0: Stroll.CallContext?) {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    override fun exitCall(p0: Stroll.CallContext?) {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    override fun exitCallValue(p0: Stroll.CallValueContext?) {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
@@ -95,15 +107,7 @@ class StrollScriptListener : StrollListener {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    override fun exitContentValue(p0: Stroll.ContentValueContext?) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
     override fun exitEveryRule(ctx: ParserRuleContext?) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-    override fun exitMethodContents(p0: Stroll.MethodContentsContext?) {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
@@ -111,11 +115,7 @@ class StrollScriptListener : StrollListener {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    override fun exitMethodCall(p0: Stroll.MethodCallContext?) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-    override fun enterMethodContents(p0: Stroll.MethodContentsContext?) {
+    override fun exitCallPunctuation(p0: Stroll.CallPunctuationContext?) {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
@@ -127,7 +127,7 @@ class StrollScriptListener : StrollListener {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    override fun enterMethodCall(p0: Stroll.MethodCallContext?) {
+    override fun enterCallValue(p0: Stroll.CallValueContext?) {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 }
