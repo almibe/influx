@@ -23,11 +23,6 @@ import jetbrains.exodus.entitystore.PersistentEntityStore
 import org.almibe.stroll.loader.readScript
 import org.almibe.stroll.runner.StrollScriptRunner
 
-data class ReadProperty(val propertyName: String, val propertyType: String, val stringValue: String)
-data class ReadLink(val linkName: String, val entityId: String)
-data class ReadEntity(val entityType: String, val entityId: String,
-                      val properties: Set<ReadProperty>, val links: Set<ReadLink>)
-
 class Stroll(val entityStore: PersistentEntityStore) {
     private val scriptRunner = StrollScriptRunner()
 
