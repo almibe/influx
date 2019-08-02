@@ -17,17 +17,8 @@ specific language governing permissions and limitations
 under the License.
 */
 
-package org.almibe.stroll
+package org.almibe.stroll.parser
 
-import jetbrains.exodus.entitystore.PersistentEntityStore
-import org.almibe.stroll.loader.readScript
-import org.almibe.stroll.runner.StrollScriptRunner
+class StrollParserSpec {
 
-class Stroll(val entityStore: PersistentEntityStore) {
-    private val scriptRunner = StrollScriptRunner()
-
-    fun run(script: String): String {
-        val readScript = readScript(script)
-        return scriptRunner.runStrollScript(entityStore, readScript)
-    }
 }
