@@ -23,7 +23,7 @@ Relation to Turtle/SPARQL
  - allow querying external stores via SPARQL endpoints
  - support for statement literals and graph pattern match literals
 
-Relation to Kotlin
+Relation to Kotlin/Rust/Modern Langs In General
  - (Rust not Kotlin) use let to define immutable variables (mutable variables are not supported)
  - dynamically typed so no type declarations
  - kotlin style lambdas sans type declarations (no planned support for function declarations just lambdas)
@@ -34,6 +34,7 @@ Relation to Kotlin
  - no support for kotlin style comments, use # instead
 
 Relation to Clojure
+ - Implemented in Clojure
  - Eventually transpiled to Clojure (for now)
  - Persistent data collections are the same impls
  - Similar syntax for collection literals (though S-Expressions are supported for the syntax in general is very different)
@@ -41,7 +42,7 @@ Relation to Clojure
 Unique-ish concepts
  - In memory graphs
    - a new data structure that represents a graph/quadstore in memory
-   - create with graph() - all graph instances are mutable (unlike collections)
+   - create with graph() - all graph instances are mutable
  
 https://www.google.com/url?sa=t&rct=j&q=&esrc=s&source=web&cd=11&cad=rja&uact=8&ved=2ahUKEwiw6Mj_yMHjAhWLQc0KHTPADts4ChC3AjAAegQICRAB&url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3DfabN6HNZ2qY&usg=AOvVaw1h2AovvmN_cBDBTQWnca8Z
 
@@ -51,7 +52,8 @@ https://web.archive.org/web/20150516154515/http://answers.semanticweb.com:80/que
 built in functions
  - collection functions
  - SPARQL's functions
- 
+
+``` 
 @prefix : <http://localhost>
 @prefix test: <http://localhost/test>
 @base <http://localhost/base>
@@ -107,3 +109,4 @@ when {
   blah.subjects.count > 90 -> return blah
   else -> return blah2
 }
+```
