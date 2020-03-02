@@ -1,21 +1,16 @@
-# Stroll
+# Wander
 
-Stroll is an experimental scripting language for working with RDF.
-It is currently being developed as part of the Ligature project, which provides support for running Stroll scripts against its quad stores.
-Stroll tries to combine ideas existing RDF serialization formats (namely Turtle and N3), SPARQL, and modern general purpose languages (mainly Kotlin and Rust).
+Wander is an experimental scripting language for working with data dynamically.
+It is currently being developed as part of the Ligature project, which provides support for running Wander scripts against its quad stores.
+Wander tries to combine ideas existing RDF serialization formats (namely Turtle and N3), SPARQL, and modern general purpose languages (mainly Kotlin and Rust).
 
-Goals of Stroll
- - be a small and easy to learn language for most people with any scripting background and some (knowledge of|interest in) RDF
- - support RDF concepts natively (iri, base, prefix, statements)
- - work transactionally (each script execution does all or nothing) <-- this depends on if the implementation is transactional
+Goals of Wander
+ - be a small and easy to learn language for most people with any scripting background and some (knowledge of|interest in) linked data
  - make heavy use of streams, expressions, and pattern matching to solve problems (no manual loops)
  - support all features SPARQL has (and probably eventually be used for Ligature's SPARQL implemenation)
- - support immutability and functional concepts where it makes sense
+ - support immutability, persistent data structures, and functional concepts
  - provide a variety of options for handling the output of a script (table, triples/quads, json, csv, xml, visualization)
-
-Non-Goals of Stroll
- - be a general purpose language
- - be able to be ran outside of an RDF datastore context
+ - run on JVM or JavaScript platform
 
 Relation to Turtle/SPARQL
  - support for @base and @prefix definitions
@@ -32,21 +27,21 @@ Relation to Kotlin
  - (Rust not Kotlin) use let to define immutable variables (mutable variables are not supported)
  - dynamically typed so no type declarations
  - kotlin style lambdas sans type declarations (no planned support for function declarations just lambdas)
- - create collections with function calls
-   - except use list() instead of listOf() and mutList() instead of mutableListOf() -- same applies for sets and maps
  - when expressions for control flow (there are no plans are in place to support other control flow mechanisms)
  - denote ranges with ..
  - support for 'in' and '!in' for working with ranges and collections
  - support for 'is' and '!is' for checking types
- - support for 'to' keyword to construct pairs (also used to create map entries)
  - no support for kotlin style comments, use # instead
 
+Relation to Clojure
+ - Eventually transpiled to Clojure (for now)
+ - Persistent data collections are the same impls
+ - Similar syntax for collection literals (though S-Expressions are supported for the syntax in general is very different)
+
 Unique-ish concepts
- - Use the $ variable to interact with the datastore you are running this script against
  - In memory graphs
    - a new data structure that represents a graph/quadstore in memory
-   - create with graph() - all graph instances are mutable
-   - same api as $
+   - create with graph() - all graph instances are mutable (unlike collections)
  
 https://www.google.com/url?sa=t&rct=j&q=&esrc=s&source=web&cd=11&cad=rja&uact=8&ved=2ahUKEwiw6Mj_yMHjAhWLQc0KHTPADts4ChC3AjAAegQICRAB&url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3DfabN6HNZ2qY&usg=AOvVaw1h2AovvmN_cBDBTQWnca8Z
 
@@ -56,17 +51,7 @@ https://web.archive.org/web/20150516154515/http://answers.semanticweb.com:80/que
 built in functions
  - collection functions
  - SPARQL's functions
-
-functions on $ object
- - get a stream of graphs, statements, subjects, predicates, objects, literals, lang literals, typed literals
- - get a stream from a pattern match of statements (matchStatements findStatements)
- - mutation functions for working with store -- just add and remove similar to Dataset
- - see Strollable's api (no support for runStroll method)
  
-stream functions
- - filter, reduce, map, count, merge, sort, take ...see other stuff from java streams/rxjava
- -
-
 @prefix : <http://localhost>
 @prefix test: <http://localhost/test>
 @base <http://localhost/base>
