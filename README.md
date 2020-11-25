@@ -2,7 +2,7 @@
 
 Wander is an experimental scripting language for working with data dynamically.
 It is currently being developed as part of the Ligature project, which provides support for running Wander scripts against its quad stores.
-Wander tries to combine ideas existing RDF serialization formats (namely Turtle and N3), SPARQL, and modern general purpose languages (mainly Kotlin and Rust).
+Wander tries to combine ideas existing RDF serialization formats (namely Turtle and N3), SPARQL, and modern general purpose languages (mainly Kotlin, Scala, and Rust).
 
 Goals of Wander
  - be a small and easy to learn language for most people with any scripting background and some (knowledge of|interest in) linked data
@@ -23,8 +23,8 @@ Relation to Turtle/SPARQL
  - allow querying external stores via SPARQL endpoints
  - support for statement literals and graph pattern match literals
 
-Relation to Kotlin/Rust/Modern Langs In General
- - (Rust not Kotlin) use let to define immutable variables (mutable variables are not supported)
+Relation to Scala/Kotlin/Rust/Modern Langs In General
+ - (Rust not Kotlin) use `let` to define immutable variables (mutable variables are not supported)
  - dynamically typed so no type declarations
  - kotlin style lambdas sans type declarations (no planned support for function declarations just lambdas)
  - when expressions for control flow (there are no plans are in place to support other control flow mechanisms)
@@ -32,12 +32,6 @@ Relation to Kotlin/Rust/Modern Langs In General
  - support for 'in' and '!in' for working with ranges and collections
  - support for 'is' and '!is' for checking types
  - no support for kotlin style comments, use # instead
-
-Relation to Clojure
- - Implemented in Clojure
- - Eventually transpiled to Clojure (for now)
- - Persistent data collections are the same impls
- - Similar syntax for collection literals (though S-Expressions are supported for the syntax in general is very different)
 
 Unique-ish concepts
  - In memory graphs
@@ -110,3 +104,11 @@ when {
   else -> return blah2
 }
 ```
+
+### Usage
+
+This is a normal sbt project, you can compile code with `sbt compile` and run it
+with `sbt run`, `sbt console` will start a Dotty REPL.
+
+For more information on the sbt-dotty plugin, see the
+[dotty-example-project](https://github.com/lampepfl/dotty-example-project/blob/master/README.md).
