@@ -8,8 +8,8 @@ import cats.effect.IO
 import cats.parse.{Parser1, Parser => P}
 import dev.ligature.{Ligature, NamedNode, Statement}
 
-final class Wander(private val instance: LigatureInstance) {
-  def runScript(in: String): IO[Either[Error, Result]] = {
+private final object WanderExecutor {
+  def execute(in: String): IO[Either[Error, Result]] = {
     val ast = parseScript(in)
     return execute(ast)
   }

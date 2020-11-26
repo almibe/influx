@@ -15,5 +15,4 @@ final class Wander(private val instance: LigatureInstance) {
   }
 }
 
-sealed trait Result
-sealed trait Error
+sealed trait WanderAst

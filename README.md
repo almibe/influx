@@ -1,6 +1,6 @@
 # Wander
 
-Wander is an experimental scripting language for working with data dynamically.
+Wander is an experimental scripting language for working with knowledge graphs.
 It is currently being developed as part of the Ligature project, which provides support for running Wander scripts against its quad stores.
 Wander tries to combine ideas existing RDF serialization formats (namely Turtle and N3), SPARQL, and modern general purpose languages (mainly Kotlin, Scala, and Rust).
 
@@ -10,7 +10,7 @@ Goals of Wander
  - support all features SPARQL has (and probably eventually be used for Ligature's SPARQL implemenation)
  - support immutability, persistent data structures, and functional concepts
  - provide a variety of options for handling the output of a script (table, triples/quads, json, csv, xml, visualization)
- - run on JVM or JavaScript platform
+ - run on the JVM
 
 Relation to Turtle/SPARQL
  - support for @base and @prefix definitions
@@ -47,6 +47,19 @@ built in functions
  - collection functions
  - SPARQL's functions
 
+## NOTES: 11/25
+`$` is the context of the script -- it is usually either the store or a single dataset depending on how the script is called -- for now only store is supported
+
+Methods on store
+ * `$.dataset(name)` - get a single dataset
+ * `$.datasets()` - get all datasets
+ * `$.datasets(prefix)` - get datasets that start with prefix
+ * `$.datasets(start, stop)` - get dataset in range
+ * `$.createDataset(name)` - create a dataset
+ * `$.deleteDataset(name)` - delete a dataset
+
+By default, scripts run in a read block, if you want to manipulate the store you must opt into a write block.
+
 ``` 
 @prefix : <http://localhost>
 @prefix test: <http://localhost/test>
@@ -56,7 +69,7 @@ let iri = <http://test>
 let iri2 = <#frombase>
 let iri3 = :fromPrefix
 let iri4 = test:alsoFromPrefix
-let graphs = $.graphs
+let datasets = $.datasets
 let statementInDefaultGraph = iri a :resource
 let statementInNamedGraph = iri a :resource :graph2
 let list = list()
@@ -68,7 +81,7 @@ let mutSet = mutSet()
 let pair = 5 to "hello"
 let statement = $.matchStatements(iri <http://predicate/something> :prefix)
 #or
-let specificStatements = $.match(iri <http://predicate/something> :prefix) #all statements that match pattern across all graphs
+let specificStatements = $.match(iri <http://predicate/something> :prefix) #all statements that match pattern across all datasets
 let statements = $.match(iri ? ? ?) #all statements with that subject
 
 let lambda = {x,y -> x+y} #define a lambda
@@ -76,8 +89,8 @@ let lambda = {x,y -> x+y} #define a lambda
 let nine = lambda(4, 5) #call it
 
 let result = when {
-  graphs.count > 10 -> :morethanten
-  graphs.count > 1 -> :singledigitplural
+  datasets.count > 10 -> :morethanten
+  datasets.count > 1 -> :singledigitplural
   else -> :oneorzero
 }
 
