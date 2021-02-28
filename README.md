@@ -1,86 +1,74 @@
 # Wander
 
 Wander is an experimental scripting language for working with knowledge graphs.
-It is currently being developed as part of the Ligature project, which provides support for running Wander scripts against its quad stores.
-Wander tries to combine ideas existing RDF serialization formats (namely Turtle and N3), SPARQL, and modern general purpose languages (mainly Kotlin, Scala, and Rust).
+It is currently being developed as part of the Ligature project.
+Wander tries to combine ideas from modern general purpose languages (mainly Kotlin, Scala, and Rust)
+while focusing just on what's needed for working with knowledge graphs.
 
-Goals of Wander
+## Introduction 
+
+### Goals of Wander
  - be a small and easy to learn language for most people with any scripting background and some (knowledge of|interest in) linked data
- - make heavy use of streams, expressions, and pattern matching to solve problems (no manual loops)
- - support all features SPARQL has (and probably eventually be used for Ligature's SPARQL implemenation)
- - support immutability, persistent data structures, and functional concepts
- - provide a variety of options for handling the output of a script (table, triples/quads, json, csv, xml, visualization)
- - run on the JVM
+ - make heavy use of streams (no manual loops), expressions, and pattern matching to solve problems
+ - support all features SPARQL that make sense outside of the realm of RDF
+ - support immutability and functional concepts
+ - provide a variety of options for handling the output of a script (tables, json, csv, visualizations)
 
-Relation to Turtle/SPARQL
- - support for @base and @prefix definitions
-   - must be at top of file below read/write declaration
-   - can't repeat base or override prefixes
- - support for iri literals (including use of prefix and base)
- - the keyword a is a shortcut for type-of predicate iri
- - support for typed literals and lang literals
- - use # for comments
- - allow querying external stores via SPARQL endpoints
- - support for statement literals and graph pattern match literals
-
-Relation to Scala/Kotlin/Rust/Modern Langs In General
- - (Rust not Kotlin) use `let` to define immutable variables (mutable variables are not supported)
- - dynamically typed so no type declarations
+### Relation to Scala/Kotlin/Rust/Modern Langs In General
+ - use `let` to define immutable variables (mutable variables are not supported)
+ - dynamically typed so no type declarations (I might revisit this)
  - kotlin style lambdas sans type declarations (no planned support for function declarations just lambdas)
  - when expressions for control flow (there are no plans are in place to support other control flow mechanisms)
  - denote ranges with ..
  - support for 'in' and '!in' for working with ranges and collections
  - support for 'is' and '!is' for checking types
- - no support for kotlin style comments, use # instead
+ - no support for C-style comments, use ; instead (ala Clojure)
 
-Unique-ish concepts
- - In memory graphs
-   - a new data structure that represents a graph/quadstore in memory
+### Unique-ish concepts
+ - In-memory graphs
+   - a new data structure that represents a graph in-memory
    - create with graph() - all graph instances are mutable
- 
-https://www.google.com/url?sa=t&rct=j&q=&esrc=s&source=web&cd=11&cad=rja&uact=8&ved=2ahUKEwiw6Mj_yMHjAhWLQc0KHTPADts4ChC3AjAAegQICRAB&url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3DfabN6HNZ2qY&usg=AOvVaw1h2AovvmN_cBDBTQWnca8Z
 
-example of a problem hard to solve in sparql
-https://web.archive.org/web/20150516154515/http://answers.semanticweb.com:80/questions/9842/how-to-limit-sparql-solution-group-size
+example of a problem that is hard to solve in sparql that should be easier to solve in Wander
+ - https://web.archive.org/web/20150516154515/http://answers.semanticweb.com:80/questions/9842/how-to-limit-sparql-solution-group-size
 
 built in functions
- - collection functions
- - SPARQL's functions
+ - collection/stream functions
+ - SPARQL's functions that make sense (need to make a list)
 
-## NOTES: 11/25
-`$` is the context of the script -- it is usually either the store or a single dataset depending on how the script is called -- for now only store is supported
+`$` represents the dataset a script is being ran against.
+When running against the entire store
 
 Methods on store
- * `$.dataset(name)` - get a single dataset
- * `$.datasets()` - get all datasets
- * `$.datasets(prefix)` - get datasets that start with prefix
- * `$.datasets(start, stop)` - get dataset in range
- * `$.createDataset(name)` - create a dataset
- * `$.deleteDataset(name)` - delete a dataset
-
+ * `store.dataset(name)` - get a single dataset -- TODO probably delete this?
+ * `store.datasets()` - get all datasets
+ * `store.datasets(prefix)` - get datasets that start with prefix
+ * `store.datasets(start, stop)` - get dataset in range
+ * `store.createDataset(name)` - create a dataset
+ * `store.deleteDataset(name)` - delete a dataset
+ * `store.query(datasetname) { **query code** }` - query a dataset w
 By default, scripts run in a read block, if you want to manipulate the store you must opt into a write block.
 
-``` 
-@prefix : <http://localhost>
-@prefix test: <http://localhost/test>
-@base <http://localhost/base>
+### Example code
 
-let iri = <http://test>
-let iri2 = <#frombase>
-let iri3 = :fromPrefix
-let iri4 = test:alsoFromPrefix
-let datasets = $.datasets
-let statementInDefaultGraph = iri a :resource
-let statementInNamedGraph = iri a :resource :graph2
+```
+let datasetName = dataset1 ; could also be an attribute name
+let hardCodedEntity = #23 ; you probably shouldn't do this much
+let attributeName = attribute ; could also be a dataset name
+let stringLiteral = "This is a string"
+let bytesLiteral = 0x45DEAD45
+let integerLiteral = 2342234
+let floatLiteral = 0.234
+let statement = hardCodedEntity attributeName bytesLiteral
 let list = list()
 let map = map()
 let set = set()
-let mutList = mutList()
-let mutMap = mutMap()
-let mutSet = mutSet()
-let pair = 5 to "hello"
+let mutList = mutList()  ; not sure if I need this
+let mutMap = mutMap()  ; not sure if I need this
+let mutSet = mutSet()  ; not sure if I need this
+let pair = 5 to "hello"  ; not sure if I need this
 let statement = $.matchStatements(iri <http://predicate/something> :prefix)
-#or
+;or
 let specificStatements = $.match(iri <http://predicate/something> :prefix) #all statements that match pattern across all datasets
 let statements = $.match(iri ? ? ?) #all statements with that subject
 
@@ -117,11 +105,3 @@ when {
   else -> return blah2
 }
 ```
-
-### Usage
-
-This is a normal sbt project, you can compile code with `sbt compile` and run it
-with `sbt run`, `sbt console` will start a Dotty REPL.
-
-For more information on the sbt-dotty plugin, see the
-[dotty-example-project](https://github.com/lampepfl/dotty-example-project/blob/master/README.md).
